@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background: #000;
+  color: #FFB800;
+}
+
+body {
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', 'Consolas', 'Courier New', monospace;
+  font-feature-settings: 'tnum' 1, 'zero' 1;
+}
+
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track { background: #000; }
+*::-webkit-scrollbar-thumb { background: #2A2A2A; }
+*::-webkit-scrollbar-thumb:hover { background: #404040; }
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll var(--marquee-duration, 180s) linear infinite;
+  will-change: transform;
+}
+.marquee-wrapper:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+.bbg-row-hover:hover { background: #141414; }

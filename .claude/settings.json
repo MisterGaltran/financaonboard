@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Davi/.claude/plans//**)",
+      "Bash(npm install *)"
+    ]
+  }
+}
