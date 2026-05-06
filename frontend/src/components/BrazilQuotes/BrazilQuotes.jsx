@@ -11,17 +11,31 @@ function QuoteItem({ q }) {
   const up = hasChange && pct > 0;
   const down = hasChange && pct < 0;
 
-  const color = up ? 'text-bbg-green' : down ? 'text-bbg-red' : 'text-bbg-amber-dim';
-  const symbolColor = up ? 'text-bbg-green' : down ? 'text-bbg-red' : 'text-bbg-white';
-  const arrow = up ? '▲' : down ? '▼' : '·';
+  const color = up ? 'text-positive' : down ? 'text-negative' : 'text-text-secondary';
+  const symbolColor = up ? 'text-positive' : down ? 'text-negative' : 'text-text-primary';
+  const arrow = up ? '▲' : down ? '▼' : '';
 
   return (
-    <div className={`flex-shrink-0 flex items-center gap-2 px-3 py-1 border-r border-bbg-border ${flash}`}>
-      <span className={`text-bbg-xs font-bold tracking-wider ${symbolColor}`}>{q.symbol}</span>
-      <span className={`text-bbg-xs tabular-nums ${color}`}>{fmtNum(q.price)}</span>
-      <span className={`text-bbg-xs tabular-nums font-bold ${color}`}>
-        {pct == null ? '' : `${arrow}${Math.abs(pct).toFixed(2)}%`}
+    <div className={`flex-shrink-0 flex items-center gap-2 px-3 py-1 border-r border-border ${flash}`}>
+      <span className={`text-ui-xs font-semibold tracking-wider ${symbolColor}`}>{q.symbol}</span>
+      <span className={`text-ui-xs tabular-nums ${color}`}>{fmtNum(q.price)}</span>
+      <span className={`text-ui-xs tabular-nums font-semibold ${color}`}>
+        {pct == null ? '' : `${arrow} ${Math.abs(pct).toFixed(2)}%`}
       </span>
+    </div>
+  );
+}
+
+function SkeletonQuotes() {
+  return (
+    <div className="flex items-center gap-3 px-3 py-2">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-2">
+          <div className="skeleton h-3 w-12" />
+          <div className="skeleton h-3 w-14" />
+          <div className="skeleton h-3 w-10" />
+        </div>
+      ))}
     </div>
   );
 }
@@ -51,18 +65,18 @@ export default function BrazilQuotes() {
   }, [quotes.length]);
 
   return (
-    <div className="bg-bbg-panel border-b border-bbg-border overflow-hidden">
+    <div className="bg-surface-alt border-b border-border overflow-hidden">
       <div className="flex items-stretch">
-        <div className="flex-shrink-0 flex flex-col justify-center px-2 py-1 border-r border-bbg-border bg-black z-10 leading-tight">
-          <div className="text-bbg-xs text-bbg-yellow font-bold tracking-widest">IBOV</div>
-          <div className="tabular-nums text-[9px] text-bbg-muted tracking-normal">
-            {quotes.length ? `${quotes.length}·${fmtTime(lastUpdate)}` : '...'}
+        <div className="flex-shrink-0 flex flex-col justify-center px-3 py-1 border-r border-border bg-surface z-10 leading-tight">
+          <div className="text-ui-xs text-accent font-semibold tracking-widest">IBOV</div>
+          <div className="tabular-nums text-[10px] text-text-secondary tracking-normal">
+            {quotes.length ? `${quotes.length} · ${fmtTime(lastUpdate)}` : '...'}
           </div>
         </div>
 
         <div className="flex-1 overflow-hidden marquee-wrapper relative">
           {quotes.length === 0 ? (
-            <div className="px-3 py-2 text-bbg-xs text-bbg-muted">LOADING IBOV COMPOSITION...</div>
+            <SkeletonQuotes />
           ) : (
             <div className="marquee-track" style={{ '--marquee-duration': duration }}>
               {[...quotes, ...quotes].map((q, idx) => (
@@ -70,8 +84,8 @@ export default function BrazilQuotes() {
               ))}
             </div>
           )}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-bbg-panel to-transparent" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-4 bg-gradient-to-l from-bbg-panel to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-surface-alt to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-surface-alt to-transparent" />
         </div>
       </div>
     </div>
