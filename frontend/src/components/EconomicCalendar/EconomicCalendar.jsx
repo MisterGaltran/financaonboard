@@ -7,6 +7,8 @@ import { flagFor } from '../../utils/countries';
 import { useFlash } from '../../hooks/useFlash';
 import CountryFilter from './CountryFilter';
 
+const PRIORITY_COUNTRIES = new Set(['BR', 'US', 'EU']);
+
 function ActualCell({ value }) {
   const flash = useFlash(typeof value === 'number' ? value : parseFloat(value));
   return (
@@ -101,6 +103,9 @@ export default function EconomicCalendar() {
     const selectedSet = new Set(selectedCountries);
     const windowEnd = now + 24 * 3600 * 1000;
     const filtered = events.filter((e) => {
+      // Smart default: priority countries show all, others only high impact
+      const isPriority = PRIORITY_COUNTRIES.has(e.country);
+      if (!isPriority && e.impact !== 'high') return false;
       if (selectedSet.size > 0 && !selectedSet.has(e.country)) return false;
       if (hideLowImpact && e.impact === 'low') return false;
       const ts = parseEventTs(e.time);
