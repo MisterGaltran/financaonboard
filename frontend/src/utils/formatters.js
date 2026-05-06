@@ -1,22 +1,24 @@
+const TZ = 'America/Sao_Paulo';
+
 export const fmtTime = (ts) => {
   if (!ts) return '--:--:--';
   const d = typeof ts === 'number' ? new Date(ts) : new Date(ts);
   if (Number.isNaN(d.getTime())) return String(ts);
-  return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  return d.toLocaleTimeString('pt-BR', { timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit' });
 };
 
 export const fmtDateTime = (ts) => {
   if (!ts) return '--';
   const d = typeof ts === 'number' ? new Date(ts) : new Date(ts);
   if (Number.isNaN(d.getTime())) return String(ts);
-  return d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleString('pt-BR', { timeZone: TZ, day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 };
 
 export const fmtHHMM = (ts) => {
   if (!ts) return '--:--';
   const d = typeof ts === 'number' ? new Date(ts) : new Date(ts);
   if (Number.isNaN(d.getTime())) return String(ts);
-  return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleTimeString('pt-BR', { timeZone: TZ, hour: '2-digit', minute: '2-digit' });
 };
 
 export const impactClass = (impact) => {

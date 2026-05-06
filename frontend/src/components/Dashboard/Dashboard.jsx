@@ -38,7 +38,7 @@ export default function Dashboard({ onOpenPalette }) {
         <div className="flex items-center justify-between px-4 py-1 border-t border-border">
           <StatusBar />
           <div className="text-ui-xs text-text-secondary tabular-nums tracking-wider">
-            {new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()}
+            {new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()}
           </div>
         </div>
       </header>
