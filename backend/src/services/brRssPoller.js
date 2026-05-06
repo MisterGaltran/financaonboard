@@ -1,9 +1,35 @@
 const Parser = require('rss-parser');
+const axios = require('axios');
 const crypto = require('crypto');
 const { env } = require('../config/env');
 const { logger } = require('../utils/logger');
 const { SOCKET_EVENTS, ROOMS, IMPACT, BR_RSS_FEEDS } = require('../config/constants');
 const { inferImpactFromText } = require('../utils/impact');
+
+async function fetchFeedText(url) {
+  const res = await axios.get(url, {
+    responseType: 'arraybuffer',
+    timeout: 8_000,
+    headers: { 'User-Agent': 'FinancaOnboard/1.0 (+local)' },
+    maxRedirects: 5
+  });
+  const buf = Buffer.from(res.data);
+  // header take precedence
+  const ct = String(res.headers['content-type'] || '').toLowerCase();
+  let charset = (ct.match(/charset=([^;]+)/) || [])[1];
+  if (!charset) {
+    const decl = buf.slice(0, 200).toString('ascii');
+    const m = decl.match(/encoding=["']([^"']+)["']/i);
+    if (m) charset = m[1].toLowerCase();
+  }
+  if (charset && /(latin1|iso-8859-1|windows-1252)/i.test(charset)) {
+    return buf.toString('latin1');
+  }
+  // try utf-8; if produces replacement char, fallback to latin1
+  const utf8 = new TextDecoder('utf-8', { fatal: false }).decode(buf);
+  if (utf8.includes('�')) return buf.toString('latin1');
+  return utf8;
+}
 
 const MAX_SEEN = 800;
 const MAX_CACHE = 200;
@@ -68,7 +94,8 @@ class BrRssPoller {
 
   async _tickOneFeed(feed) {
     try {
-      const parsed = await this.parser.parseURL(feed.url);
+      const xml = await fetchFeedText(feed.url);
+      const parsed = await this.parser.parseString(xml);
       const items = parsed.items || [];
       let emittedCount = 0;
       for (const raw of items.slice().reverse()) {
