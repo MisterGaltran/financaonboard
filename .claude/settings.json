@@ -5,7 +5,10 @@
       "Bash(npm install *)",
       "Bash(Get-ChildItem -Path \"c:\\\\financaonboard\" -Force)",
       "Bash(Select-Object Name, PSIsContainer)",
-      "Bash(npm ls *)"
+      "Bash(npm ls *)",
+      "Bash(curl -m 12 -s \"https://portchecker.io/api/v1/query\" -H \"Content-Type: application/json\" -d '{\"host\":\"186.241.4.181\",\"ports\":[80,443]}')",
+      "Bash(nslookup -type=AAAA davi-mendes.dedyn.io 8.8.8.8)",
+      "Bash(curl -m 8 -sk -o NUL -w \"lan_https=%{http_code} tls_ok\\\\n\" https://davi-mendes.dedyn.io/health --resolve davi-mendes.dedyn.io:443:192.168.1.50)"
     ]
   }
 }

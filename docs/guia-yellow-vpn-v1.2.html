@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Yellow VPN + Dev Remoto + Public HTTPS — Guia Operacional v1.2</title>
+<style>
+  :root {
+    --bg: #0e1729;
+    --bg-2: #142037;
+    --bg-card: #1a2640;
+    --bg-code: #0a1224;
+    --text: #e6ecf6;
+    --text-soft: #94a3b8;
+    --text-dim: #64748b;
+    --yellow: #f5b800;
+    --yellow-dim: #c79900;
+    --blue: #3b82f6;
+    --green: #10b981;
+    --red: #ef4444;
+    --purple: #a855f7;
+    --border: #1f2d4d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 48px 56px;
+    page-break-after: always;
+    min-height: 100vh;
+  }
+  .page:last-child { page-break-after: auto; }
+  h1 {
+    font-size: 38px;
+    line-height: 1.1;
+    margin: 12px 0 8px;
+    font-weight: 800;
+  }
+  h1 .accent { color: var(--yellow); }
+  h2 {
+    font-size: 20px;
+    margin: 28px 0 12px;
+    font-weight: 700;
+    color: var(--yellow);
+  }
+  h2 .num { color: var(--text); margin-right: 6px; }
+  h3 {
+    font-size: 15px;
+    margin: 20px 0 8px;
+    font-weight: 700;
+  }
+  p { margin: 8px 0; }
+  .subtitle {
+    color: var(--text-soft);
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--bg-card);
+    color: var(--yellow);
+    border: 1px solid var(--yellow-dim);
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .badge.green  { color: var(--green);  border-color: var(--green); }
+  .badge.blue   { color: var(--blue);   border-color: var(--blue); }
+  .badge.red    { color: var(--red);    border-color: var(--red); }
+  .badge.purple { color: var(--purple); border-color: var(--purple); }
+  .new-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--green), #06b6a4);
+    color: #001a14;
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  pre, code {
+    font-family: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+  }
+  pre {
+    background: var(--bg-code);
+    color: #cdd9ed;
+    padding: 12px 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 12px;
+    border: 1px solid var(--border);
+    margin: 10px 0;
+  }
+  code {
+    background: var(--bg-code);
+    color: #f5b800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 12px 0;
+  }
+  .card.warning  { border-color: var(--yellow-dim); background: linear-gradient(180deg, #2a1f0a, #1a2640); }
+  .card.danger   { border-color: var(--red); background: linear-gradient(180deg, #2a0e0e, #1a2640); }
+  .card.tip      { border-color: var(--blue); background: linear-gradient(180deg, #0e1a2a, #1a2640); }
+  .card.success  { border-color: var(--green); background: linear-gradient(180deg, #0e2a1a, #1a2640); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 12px;
+  }
+  th {
+    text-align: left;
+    background: var(--bg-2);
+    color: var(--text-soft);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  ul, ol { padding-left: 22px; margin: 8px 0; }
+  li { margin: 4px 0; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 24px 0; }
+  .stat {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+  }
+  .stat .big { font-size: 22px; font-weight: 800; color: var(--yellow); }
+  .stat .label { font-size: 10px; letter-spacing: 1px; color: var(--text-soft); text-transform: uppercase; margin-top: 4px; }
+  .toc {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+  .toc-row {
+    display: flex;
+    align-items: baseline;
+    border-bottom: 1px dotted var(--border);
+    padding: 6px 0;
+    gap: 12px;
+  }
+  .toc-row:last-child { border-bottom: none; }
+  .toc-num { color: var(--yellow); font-weight: 800; min-width: 28px; }
+  .toc-title { flex: 1; font-weight: 600; }
+  .toc-desc { color: var(--text-soft); font-style: italic; font-size: 12px; }
+  .toc-page { color: var(--yellow); font-weight: 700; margin-left: 12px; }
+  .footer {
+    margin-top: 36px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 11px;
+    display: flex;
+    justify-content: space-between;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+  kbd {
+    display: inline-block;
+    padding: 1px 6px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 11px;
+  }
+
+  @media print {
+    @page { size: A4; margin: 12mm; }
+    body { background: white; color: #111; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { background: var(--bg); min-height: auto; padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div class="page">
+  <span class="badge">GUIA OPERACIONAL · V1.2</span>
+  <h1>Yellow <span class="accent">VPN</span><br>+ Dev Remoto<br>+ Public HTTPS<span class="new-tag">NOVO</span></h1>
+  <p class="subtitle">Manual rápido de operação para programar em casa, em viagem, manter tudo sincronizado entre Yellow, GitHub e seu notebook — e <strong>agora também</strong> hospedar apps com domínio público e TLS automático.</p>
+
+  <div class="grid-4">
+    <div class="stat"><div class="big">1TB</div><div class="label">SSD NVMe</div></div>
+    <div class="stat"><div class="big">280<span style="font-size:12px">Mbps</span></div><div class="label">Fibra Casa</div></div>
+    <div class="stat"><div class="big">24/7</div><div class="label">VPN + HTTPS</div></div>
+    <div class="stat"><div class="big">3h</div><div class="label">Backup Auto</div></div>
+  </div>
+
+  <h2><span class="num">§</span>O que mudou da v1.0 para a v1.2</h2>
+  <div class="card success">
+    <ul>
+      <li><strong>Tailscale Funnel</strong> instalado para expor backends locais publicamente via tunnel outbound. URL: <code>https://yellow-vpn.&lt;tailnet&gt;.ts.net</code>.</li>
+      <li><strong>Zero portas inbound</strong> abertas no Nokia (só WireGuard 51820/UDP). Tailscale faz tudo via outbound.</li>
+      <li><strong>App em produção:</strong> financaonboard (Express + Socket.io) rodando como systemd service na porta 4000, exposto publicamente via Funnel.</li>
+      <li><strong>DDNS corrigido:</strong> o script <code>update.sh</code> agora usa <code>curl -4</code> para forçar IPv4. Antes ele às vezes atualizava só o AAAA (IPv6) e o A ficava vazio.</li>
+      <li><strong>Frontend</strong> em CDN gratuita: Cloudflare Pages com auto-deploy a cada <code>git push</code>.</li>
+      <li><strong>Caddy desativado</strong> (foi a tentativa inicial mas o ISP Oi filtra inbound TCP 443 pra residenciais — mudamos pra Tailscale).</li>
+    </ul>
+  </div>
+
+  <h2><span class="num">§</span>Índice</h2>
+  <div class="toc">
+    <div class="toc-row"><span class="toc-num">01</span><span class="toc-title">Como conectar no Yellow</span><span class="toc-desc">Em casa e fora, com e sem VPN</span><span class="toc-page">P. 2</span></div>
+    <div class="toc-row"><span class="toc-num">02</span><span class="toc-title">Workflow diário com Tmux</span><span class="toc-desc">Sessões persistentes</span><span class="toc-page">P. 3</span></div>
+    <div class="toc-row"><span class="toc-num">03</span><span class="toc-title">Git: sincronizando entre PC e Yellow</span><span class="toc-desc">Pull antes, push depois</span><span class="toc-page">P. 4</span></div>
+    <div class="toc-row"><span class="toc-num">04</span><span class="toc-title">VS Code Remote-SSH</span><span class="toc-desc">IDE rodando no Yellow</span><span class="toc-page">P. 5</span></div>
+    <div class="toc-row"><span class="toc-num">05</span><span class="toc-title">Apps públicos com Tailscale Funnel<span class="new-tag">v1.2</span></span><span class="toc-desc">HTTPS automático sem abrir portas</span><span class="toc-page">P. 6</span></div>
+    <div class="toc-row"><span class="toc-num">06</span><span class="toc-title">Economizando dados móveis</span><span class="toc-desc">Como usar IA sem estourar 4G</span><span class="toc-page">P. 7</span></div>
+    <div class="toc-row"><span class="toc-num">07</span><span class="toc-title">Backup, manutenção e troubleshooting</span><span class="toc-desc">Quando algo der errado</span><span class="toc-page">P. 8</span></div>
+    <div class="toc-row"><span class="toc-num">08</span><span class="toc-title">Cheat Sheet</span><span class="toc-desc">Comandos essenciais</span><span class="toc-page">P. 9</span></div>
+  </div>
+
+  <h2><span class="num">§</span>Setup completo — o que você tem hoje</h2>
+  <div class="grid-2">
+    <ul style="margin:0">
+      <li>Pi OS Lite + WireGuard VPN</li>
+      <li>DDNS deSEC atualizando 5/5min (IPv4 forçado)</li>
+      <li>SSD 1TB em <code>/mnt/projects</code></li>
+      <li>Python 3.13 + uv 0.11</li>
+      <li>Node.js 20 LTS + pnpm</li>
+    </ul>
+    <ul style="margin:0">
+      <li>VS Code Remote-SSH ativo</li>
+      <li>Tmux (sessão <code>manutnavio</code>)</li>
+      <li>Backup automático às 3h</li>
+      <li><strong>Tailscale Funnel</strong> ativo <span class="new-tag">NOVO</span></li>
+      <li><strong>App financaonboard 24/7</strong> público</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    <span><strong>Davi Mendes</strong> · MisterGaltran · GitHub<br>yellow-vpn · 192.168.1.50<br>davi-mendes.dedyn.io</span>
+    <span style="text-align:right"><strong style="color:var(--yellow)">v1.2</strong><br>Maio 2026<br>Fortaleza, BR</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 1 — CONECTAR ============ -->
+<div class="page">
+  <h2><span class="num">01</span>Como conectar no Yellow</h2>
+  <p class="subtitle">A regra é simples: em casa SSH direto, fora de casa precisa VPN primeiro.</p>
+
+  <h3><span class="badge green">A</span> Em casa <span style="color:var(--text-soft)">— sem VPN</span></h3>
+  <pre>$ ssh davi@yellow-vpn.local
+# OU pelo IP fixo:
+$ ssh davi@192.168.1.50</pre>
+
+  <h3><span class="badge red">B</span> Fora de casa <span style="color:var(--text-soft)">— precisa VPN</span></h3>
+  <ol>
+    <li>Abrir <strong>WireGuard</strong> no notebook</li>
+    <li>Ativar tunnel <code>notebook-davi</code></li>
+    <li>Aguardar 2-3 segundos para o túnel estabilizar</li>
+    <li>Rodar SSH normalmente: <code>ssh davi@192.168.1.50</code></li>
+  </ol>
+
+  <div class="card tip">
+    <strong>Por que precisa VPN fora de casa:</strong> o IP <code>192.168.1.50</code> é privado da sua rede. Fora dela, ninguém consegue chegar. A VPN faz seu notebook entrar virtualmente na sua casa.
+  </div>
+
+  <h3>Tabela de cenários</h3>
+  <table>
+    <thead><tr><th>Onde estou</th><th>VPN?</th><th>Comando</th></tr></thead>
+    <tbody>
+      <tr><td>Casa (Wi-Fi de casa)</td><td>Não precisa</td><td><code>ssh davi@yellow-vpn.local</code></td></tr>
+      <tr><td>Hotel / Aeroporto</td><td>Sim, ativar antes</td><td><code>ssh davi@192.168.1.50</code></td></tr>
+      <tr><td>Hotspot 4G/5G</td><td>Sim, ativar antes</td><td><code>ssh davi@192.168.1.50</code></td></tr>
+      <tr><td>Bordo (Amaralina Star)</td><td>Sim, se firewall deixar</td><td><code>ssh davi@192.168.1.50</code></td></tr>
+      <tr><td>Casa de família</td><td>Sim, ativar antes</td><td><code>ssh davi@192.168.1.50</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Pelo celular Android</h3>
+  <p>Ativa o tunnel <code>VPNCasa</code> (que usa IP direto, driblando bloqueio Claro). Use apps como <strong>Termius</strong> ou <strong>JuiceSSH</strong> com IP <code>192.168.1.50</code>.</p>
+
+  <div class="card warning">
+    <strong>Atenção Claro 5G:</strong> a Claro bloqueia o domínio <code>davi-mendes.dedyn.io</code>. Por isso o celular usa Endpoint por IP fixo. Se um dia o IP da Oi mudar, atualize o perfil VPN do celular.
+  </div>
+
+  <h3>Acesso público <span class="new-tag">v1.2</span></h3>
+  <p>Diferente da v1.0, agora o Yellow também responde a <code>https://yellow-vpn.tailf47dec.ts.net</code> de qualquer lugar (sem VPN), mas <strong>apenas para apps publicados via Tailscale Funnel</strong>. SSH continua restrito à LAN/VPN.</p>
+
+  <div class="footer">
+    <span>01 · Como conectar no Yellow</span>
+    <span>2 / 9</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 2 — TMUX ============ -->
+<div class="page">
+  <h2><span class="num">02</span>Workflow diário com Tmux</h2>
+  <p class="subtitle">Sessões que sobrevivem ao seu desconectar — base do trabalho remoto.</p>
+
+  <div class="card tip">
+    <strong>O que é tmux:</strong> programa que mantém tudo rodando no Yellow mesmo quando você fecha o SSH. Você inicia um build, fecha o notebook, vai almoçar, volta e está tudo lá.
+  </div>
+
+  <h3>Iniciar sessão de trabalho</h3>
+  <pre>$ cd /mnt/projects/financaonboard
+$ tmux attach -t manutnavio || tmux new -s manutnavio</pre>
+
+  <h3>Sair sem matar (DETACH)</h3>
+  <p><kbd>Ctrl</kbd> + <kbd>B</kbd> → solta tudo → <kbd>D</kbd></p>
+  <p>Você verá <code>[detached (from session manutnavio)]</code> e volta ao prompt normal. Tudo continua rodando!</p>
+
+  <h3>Atalhos essenciais</h3>
+  <table>
+    <thead><tr><th>Atalho</th><th>O que faz</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd> <kbd>D</kbd></td><td>Detach — sair mantendo sessão viva</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd> <kbd>|</kbd></td><td>Split vertical (lado a lado)</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd> <kbd>-</kbd></td><td>Split horizontal (cima/embaixo)</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd> <kbd>C</kbd></td><td>Nova janela na sessão</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd> <kbd>N</kbd>/<kbd>P</kbd></td><td>Próxima / Anterior janela</td></tr>
+      <tr><td><kbd>Alt</kbd>+<kbd>↑↓←→</kbd></td><td>Navegar entre painéis (sem prefix)</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd> <kbd>X</kbd></td><td>Fechar painel atual</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Comandos úteis</h3>
+  <pre># Listar sessões ativas
+$ tmux ls
+
+# Reconectar a uma sessão específica
+$ tmux attach -t manutnavio
+
+# Criar nova sessão nomeada
+$ tmux new -s nome-da-sessao
+
+# Matar uma sessão (se travou)
+$ tmux kill-session -t nome-da-sessao</pre>
+
+  <div class="card warning">
+    <strong>Cuidado com programas de tela cheia (top, htop, vim):</strong> aperte <kbd>Ctrl</kbd>+<kbd>B</kbd>, <strong>solte</strong>, e SÓ DEPOIS aperte <kbd>D</kbd>.
+  </div>
+
+  <div class="footer">
+    <span>02 · Workflow diário com Tmux</span>
+    <span>3 / 9</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 3 — GIT ============ -->
+<div class="page">
+  <h2><span class="num">03</span>Git: sincronizando entre PC e Yellow</h2>
+  <p class="subtitle">Pull antes de começar, push antes de fechar — sempre.</p>
+
+  <div class="card danger">
+    <strong>Erro mais comum:</strong> esquecer de <code>git push</code> antes de sair de casa. Você abre o notebook em viagem, faz <code>git pull</code> e não tem nada novo. Aí tem que voltar/conectar VPN só pra pushar.
+  </div>
+
+  <h3>Antes de COMEÇAR a programar</h3>
+  <pre>$ cd /mnt/projects/financaonboard   # ou pasta do PC
+$ git pull</pre>
+
+  <h3>Antes de PARAR de programar</h3>
+  <pre>$ git status                       # o que mudou?
+$ git add .                        # adiciona tudo
+$ git commit -m "descrição clara"  # commit local
+$ git push                         # envia pro GitHub</pre>
+
+  <h3>Como saber se tem coisa não pushada</h3>
+  <pre>$ git log origin/main..HEAD
+# Se NADA aparecer = tudo no GitHub
+# Se commits aparecerem = falta dar git push!</pre>
+
+  <h3>Atualizar o app financaonboard <span class="new-tag">NOVO</span></h3>
+  <p><strong>Frontend:</strong> qualquer push pra main dispara rebuild automático no Cloudflare Pages.</p>
+  <p><strong>Backend:</strong> precisa rodar o script de deploy no Yellow após o push:</p>
+  <pre>$ bash /mnt/projects/financaonboard/infra/deploy.sh</pre>
+  <p>O script faz <code>git pull</code> + <code>npm ci --omit=dev</code> + <code>systemctl restart financaonboard-api</code> e mostra status.</p>
+
+  <h3>Cuidado com conflitos</h3>
+  <ul>
+    <li>Sempre <code>git pull</code> antes de começar</li>
+    <li>Trabalha em UM lugar de cada vez (não edita simultaneamente em PC e Yellow)</li>
+    <li>Se conflito acontecer: o Git marca o arquivo, você abre, escolhe a versão, depois <code>git add</code> + <code>git commit</code></li>
+  </ul>
+
+  <div class="footer">
+    <span>03 · Git: sincronizando</span>
+    <span>4 / 9</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 4 — VSCODE ============ -->
+<div class="page">
+  <h2><span class="num">04</span>VS Code Remote-SSH</h2>
+  <p class="subtitle">IDE completa rodando no Yellow, editando como se fosse local.</p>
+
+  <h3>Conectar no Yellow pelo VS Code</h3>
+  <ol>
+    <li>Abre o VS Code no notebook</li>
+    <li><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> → digita "Remote-SSH: Connect to Host..."</li>
+    <li>Escolhe <code>yellow-vpn</code></li>
+    <li>Digita senha do <code>davi</code> quando pedir</li>
+    <li>Aguarda conectar (canto inferior esquerdo: <strong>SSH: yellow-vpn</strong>)</li>
+    <li>File → Open Folder → digita <code>/mnt/projects/financaonboard</code></li>
+  </ol>
+
+  <h3>Atalhos diários no VS Code</h3>
+  <table>
+    <thead><tr><th>Atalho</th><th>O que faz</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>`</kbd></td><td>Abrir/fechar terminal integrado (já no Yellow)</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>P</kbd></td><td>Buscar arquivo por nome</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd></td><td>Buscar texto no projeto inteiro</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd></td><td>Painel Source Control (Git)</td></tr>
+      <tr><td><kbd>F1</kbd></td><td>Paleta de comandos</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card tip">
+    <strong>Dica de produtividade:</strong> abre o terminal integrado e roda <code>tmux attach -t manutnavio</code>. Assim você tem IDE + tmux integrados.
+  </div>
+
+  <h3>Desconectar com segurança</h3>
+  <ol>
+    <li>Salva tudo (<kbd>Ctrl</kbd>+<kbd>S</kbd> ou auto-save)</li>
+    <li>Faz <code>git push</code> se houver mudanças</li>
+    <li>No tmux: <kbd>Ctrl</kbd>+<kbd>B</kbd> <kbd>D</kbd> (detach)</li>
+    <li>Fecha a janela do VS Code Remote</li>
+  </ol>
+
+  <div class="grid-2">
+    <div class="card">
+      <span class="badge green">EM CASA</span>
+      <p>Sem VPN. Conecta direto pelo VS Code: <code>Host yellow-vpn</code> → vai funcionar normal.</p>
+    </div>
+    <div class="card">
+      <span class="badge blue">EM VIAGEM</span>
+      <p>Liga WireGuard primeiro. Depois VS Code Remote-SSH usa <strong>a mesma config</strong> — não muda nada.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>04 · VS Code Remote-SSH</span>
+    <span>5 / 9</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 5 — TAILSCALE FUNNEL ============ -->
+<div class="page">
+  <h2><span class="num">05</span>Apps públicos com Tailscale Funnel<span class="new-tag">v1.2</span></h2>
+  <p class="subtitle">Como expor um backend do Yellow na internet sem abrir portas.</p>
+
+  <div class="card tip">
+    <strong>O que é Tailscale Funnel:</strong> tunnel reverso. Em vez do público bater na porta do Yellow, o Yellow inicia uma conexão outbound persistente com a infraestrutura do Tailscale, e o Tailscale expõe um endpoint público com TLS automático.
+  </div>
+
+  <h3>Por que não usamos Caddy + porta 443</h3>
+  <p>A primeira tentativa foi Caddy + DNS-01 challenge no domínio <code>davi-mendes.dedyn.io</code>. Setup local funcionou, mas testes em <code>check-host.net</code> revelaram que <strong>o ISP Oi filtra inbound TCP 443 pra IPs residenciais</strong>: praticamente nenhum nó do mundo conseguia conectar. Migramos pra Funnel porque ele usa outbound — não passa pelo filtro.</p>
+
+  <h3>Arquitetura</h3>
+  <pre>[internet] → tailnet edge → tailscaled (Yellow, outbound)
+                                       │
+                                       ├─ tailscaled.state (chaves, peers, config Funnel)
+                                       └─ TLS auto pelo Tailscale Edge
+                                       │
+                                       ▼
+                              localhost:4000 (financaonboard-api)
+                              localhost:5000 (próximo app, via path)</pre>
+
+  <h3>Status atual</h3>
+  <pre>$ tailscale funnel status
+# Funnel on:
+#     - https://yellow-vpn.tailf47dec.ts.net
+https://yellow-vpn.tailf47dec.ts.net (Funnel on)
+|-- / proxy http://127.0.0.1:4000
+
+$ curl -I https://yellow-vpn.tailf47dec.ts.net/health
+HTTP/2 200</pre>
+
+  <h3>Adicionar um novo app público</h3>
+  <p>Funnel só roteia pra uma porta como raiz. Pra múltiplos apps, use paths:</p>
+  <pre># reset config
+sudo tailscale funnel reset
+
+# expõe app1 em /api/financa, app2 em /api/outro
+sudo tailscale serve --bg --https=443 --set-path=/api/financa http://localhost:4000
+sudo tailscale serve --bg --https=443 --set-path=/api/outro http://localhost:5000
+sudo tailscale funnel --bg 443 on
+
+# verifica
+tailscale funnel status</pre>
+
+  <h3>Operação do Tailscale</h3>
+  <pre># status do daemon
+sudo systemctl status tailscaled
+
+# status do Funnel especificamente
+tailscale funnel status
+
+# logs ao vivo
+journalctl -u tailscaled -f
+
+# restart (preserva config Funnel)
+sudo systemctl restart tailscaled
+
+# desligar Funnel (mantém Tailscale rodando)
+sudo tailscale funnel --https=443 off
+
+# IP no tailnet (pra conexões internas)
+tailscale ip -4</pre>
+
+  <h3>Renovação de certificados</h3>
+  <p>Automática pelo Tailscale, ~30 dias antes do vencimento. Não faz nada.</p>
+
+  <div class="card warning">
+    <strong>Funnel é gratuito mas tem limite de uso.</strong> Tailscale Free tier permite Funnel mas com rate limits. Pra app pessoal de baixo tráfego, suficiente. Se virar mainstream, considera plano pago ou comprar um domínio próprio + Cloudflare Tunnel.
+  </div>
+
+  <div class="footer">
+    <span>05 · Apps públicos com Tailscale Funnel</span>
+    <span>6 / 9</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 6 — DADOS ============ -->
+<div class="page">
+  <h2><span class="num">06</span>Economizando dados móveis</h2>
+  <p class="subtitle">Como minimizar consumo do 4G ao programar em viagem.</p>
+
+  <div class="card warning">
+    <strong>Verdade que dói:</strong> SSH/VS Code Remote-SSH NÃO economizam 4G — toda interação trafega pelo seu plano. O que economiza é deixar a IA e os builds rodando no Yellow.
+  </div>
+
+  <h3>Comparação de consumo (4G/h)</h3>
+  <table>
+    <thead><tr><th>Cenário</th><th>Onde IA roda</th><th>Consumo 4G</th></tr></thead>
+    <tbody>
+      <tr><td>Cursor / Copilot LOCAL editando arquivos do Yellow</td><td>Notebook</td><td style="color:var(--red);font-weight:700">10-30 MB/h</td></tr>
+      <tr><td>Continue / Copilot REMOTO (instalado no Yellow)</td><td>Yellow</td><td style="color:var(--yellow);font-weight:700">5-10 MB/h</td></tr>
+      <tr><td>Claude Code CLI no tmux do Yellow</td><td>Yellow (CLI)</td><td style="color:var(--green);font-weight:700">1-2 MB/h</td></tr>
+      <tr><td>SSH puro + nano/vim (sem IDE)</td><td>—</td><td style="color:var(--green);font-weight:700">~1 MB/h</td></tr>
+      <tr><td>Programar local + git push/pull pontual</td><td>—</td><td style="color:var(--green);font-weight:700">poucos KB</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Estratégias por situação</h3>
+  <div class="grid-2">
+    <div class="card">
+      <span class="badge green">WI-FI GRÁTIS</span>
+      <p>VPN + VS Code Remote-SSH normal. Consome Wi-Fi grátis, não seu plano.</p>
+    </div>
+    <div class="card">
+      <span class="badge blue">4G FOLGADO</span>
+      <p>VPN + VS Code Remote-SSH. Consumo é baixo (5-10 MB/h), tranquilo.</p>
+    </div>
+    <div class="card">
+      <span class="badge purple">4G APERTADO</span>
+      <p>Edita LOCAL no notebook. Sincroniza via Git pontualmente. Consumo: KB.</p>
+    </div>
+    <div class="card">
+      <span class="badge red">SEM INTERNET</span>
+      <p>Edita local offline. Commit local, push quando voltar a ter internet.</p>
+    </div>
+  </div>
+
+  <h3>Dicas para usar IA no Yellow</h3>
+  <ul>
+    <li><strong>Continue / Copilot:</strong> instalar pelo VS Code conectado em <code>SSH: yellow-vpn</code> → "Install in SSH" (não local)</li>
+    <li><strong>Claude Code CLI:</strong> instalar no Yellow, rodar dentro do tmux. Tudo passa pela fibra de casa</li>
+    <li><strong>Cursor:</strong> é app standalone, não funciona como Remote-SSH. Para 4G limitado, evite</li>
+    <li>Ao mover IA para o Yellow: passar a chave da API via variável de ambiente lá também</li>
+  </ul>
+
+  <div class="footer">
+    <span>06 · Economizando dados móveis</span>
+    <span>7 / 9</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 7 — BACKUP / TROUBLE ============ -->
+<div class="page">
+  <h2><span class="num">07</span>Backup, manutenção e troubleshooting</h2>
+  <p class="subtitle">Quando algo der errado, ou só manutenção rotineira.</p>
+
+  <h3>Backups automáticos</h3>
+  <p>Roda automaticamente todo dia <strong>às 3h da manhã</strong>. Mantém os últimos 7 dias. Salva em <code>/mnt/projects/backups/</code>.</p>
+  <pre># Ver backups disponíveis
+$ ls -lh /mnt/projects/backups/
+
+# Rodar backup manual agora
+$ ~/scripts/backup-projects.sh
+
+# Ver agendamentos do cron
+$ crontab -l</pre>
+
+  <div class="card warning">
+    <strong>Backup local NÃO substitui Git.</strong> Para projetos com Git, o GitHub é seu backup principal. O backup local protege contra <code>rm -rf</code> acidental, mas não contra falha do SSD ou incêndio.
+  </div>
+
+  <h3>O que precisa de backup externo (fora do Yellow)</h3>
+  <ul>
+    <li>Arquivos <code>.env</code> dos projetos (API keys)</li>
+    <li>Token deSEC em <code>/etc/caddy/desec.env</code></li>
+    <li>Chave SSH privada do Yellow (<code>~/.ssh/id_ed25519</code>)</li>
+  </ul>
+
+  <h3>Manutenção mensal</h3>
+  <pre>$ sudo apt update && sudo apt full-upgrade -y    # atualiza
+$ sudo apt autoremove -y                          # limpa
+$ df -h /mnt/projects                             # espaço SSD
+$ sudo nvme smart-log /dev/nvme0n1 | head -10     # saúde SSD</pre>
+
+  <h3>Atualizar o Tailscale <span class="new-tag">v1.2</span></h3>
+  <p>O Tailscale tem repositório próprio do apt. Atualização padrão:</p>
+  <pre>$ sudo apt update && sudo apt install -y --only-upgrade tailscale
+$ tailscale version</pre>
+  <p>Ou rerodar o instalador oficial: <code>curl -fsSL https://tailscale.com/install.sh | sh</code></p>
+
+  <h3>Problemas comuns</h3>
+  <table>
+    <thead><tr><th>Sintoma</th><th>Solução</th></tr></thead>
+    <tbody>
+      <tr><td>SSH não conecta de fora</td><td>Conferir se VPN está ativa no notebook</td></tr>
+      <tr><td>VPN conecta mas SSH falha</td><td>Aguardar 5s, ou reiniciar tunnel WireGuard</td></tr>
+      <tr><td>VS Code Remote travado</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> → "Reload Window"</td></tr>
+      <tr><td>Tmux session morreu</td><td>Yellow reiniciou — <code>tmux new -s manutnavio</code></td></tr>
+      <tr><td>SSD não monta após reboot</td><td><code>sudo mount -a</code>; conferir <code>/etc/fstab</code></td></tr>
+      <tr><td>git push pede senha</td><td>SSH key não carregada — testar <code>ssh -T git@github.com</code></td></tr>
+      <tr><td><strong>App público fora do ar</strong> <span class="new-tag">v1.2</span></td><td><code>systemctl is-active financaonboard-api tailscaled</code> + <code>tailscale funnel status</code></td></tr>
+      <tr><td><strong>Funnel sumiu após reboot</strong> <span class="new-tag">v1.2</span></td><td>Reativar: <code>sudo tailscale funnel --bg 4000</code></td></tr>
+      <tr><td><strong>TLS erro no Funnel</strong> <span class="new-tag">v1.2</span></td><td>Forçar emissão: <code>sudo tailscale cert &lt;dominio&gt;.ts.net</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Verificar saúde do sistema</h3>
+  <pre>$ uptime                                          # tempo ligado
+$ free -h                                         # memória RAM
+$ df -h                                           # espaço em disco
+$ sudo wg show                                    # status WireGuard
+$ tail /home/davi/desec/update.log                # log DDNS
+$ systemctl is-active financaonboard-api tailscaled   # apps públicos
+$ tailscale funnel status                         # endpoint Funnel ativo</pre>
+
+  <h3>Emergências</h3>
+  <div class="grid-2">
+    <ul style="margin:0">
+      <li>Esqueci senha SSH: precisa monitor + teclado direto no Yellow</li>
+      <li>Yellow não liga: tirar fonte, esperar 30s, reconectar</li>
+    </ul>
+    <ul style="margin:0">
+      <li>SSD desconectou: abrir Yellow, conferir parafuso M.2</li>
+      <li>Perdi VPN celular: em casa, <code>pivpn add</code> + <code>pivpn -qr</code></li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    <span>07 · Backup e troubleshooting</span>
+    <span>8 / 9</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 8 — CHEAT SHEET ============ -->
+<div class="page">
+  <h2><span class="num">08</span>Cheat Sheet — Comandos essenciais</h2>
+  <p class="subtitle">Imprima esta página e cole na sua mesa.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <span class="badge green">CASA</span>
+      <h3>Conectar</h3>
+      <pre>$ ssh davi@yellow-vpn.local
+$ tmux attach -t manutnavio</pre>
+    </div>
+    <div class="card">
+      <span class="badge blue">VIAGEM</span>
+      <h3>Conectar</h3>
+      <pre># 1) Liga WireGuard no notebook
+$ ssh davi@192.168.1.50
+$ tmux attach -t manutnavio</pre>
+    </div>
+    <div class="card">
+      <span class="badge purple">GIT</span>
+      <h3>Antes de programar</h3>
+      <pre>$ cd /mnt/projects/financaonboard
+$ git pull</pre>
+    </div>
+    <div class="card">
+      <span class="badge purple">GIT</span>
+      <h3>Depois de programar</h3>
+      <pre>$ git add .
+$ git commit -m "mensagem"
+$ git push</pre>
+    </div>
+    <div class="card">
+      <span class="badge">TMUX</span>
+      <h3>Detach (sair sem matar)</h3>
+      <p><kbd>Ctrl</kbd>+<kbd>B</kbd> → solta → <kbd>D</kbd></p>
+    </div>
+    <div class="card">
+      <span class="badge">TMUX</span>
+      <h3>Splits</h3>
+      <p><kbd>Ctrl</kbd>+<kbd>B</kbd> <kbd>|</kbd> = vertical<br><kbd>Ctrl</kbd>+<kbd>B</kbd> <kbd>-</kbd> = horizontal</p>
+    </div>
+    <div class="card">
+      <span class="badge red">DEPLOY</span>
+      <h3>Backend financaonboard <span class="new-tag">NOVO</span></h3>
+      <pre>$ bash /mnt/projects/financaonboard/infra/deploy.sh</pre>
+    </div>
+    <div class="card">
+      <span class="badge red">FUNNEL</span>
+      <h3>Operação <span class="new-tag">v1.2</span></h3>
+      <pre>$ tailscale funnel status
+$ journalctl -u tailscaled -f
+$ sudo tailscale funnel --bg 4000   # reativar
+$ sudo tailscale funnel reset       # limpar config</pre>
+    </div>
+  </div>
+
+  <h3>Referência rápida</h3>
+  <table>
+    <tbody>
+      <tr><td><strong>IP Yellow LAN</strong></td><td><code>192.168.1.50</code></td></tr>
+      <tr><td><strong>IP Yellow tailnet</strong></td><td><code>100.105.11.118</code></td></tr>
+      <tr><td><strong>Hostname casa</strong></td><td><code>yellow-vpn.local</code></td></tr>
+      <tr><td><strong>DDNS pessoal (WG)</strong></td><td><code>davi-mendes.dedyn.io</code></td></tr>
+      <tr><td><strong>URL pública apps</strong> <span class="new-tag">v1.2</span></td><td><code>yellow-vpn.tailf47dec.ts.net</code></td></tr>
+      <tr><td><strong>Usuário</strong></td><td><code>davi</code></td></tr>
+      <tr><td><strong>Pasta projetos</strong></td><td><code>/mnt/projects/</code></td></tr>
+      <tr><td><strong>Sessão tmux</strong></td><td><code>manutnavio</code></td></tr>
+      <tr><td><strong>GitHub</strong></td><td><code>MisterGaltran</code></td></tr>
+      <tr><td><strong>Estado Tailscale</strong> <span class="new-tag">v1.2</span></td><td><code>/var/lib/tailscale/tailscaled.state</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Workflow completo de uma sessão</h3>
+  <ol>
+    <li><strong>Conectar:</strong> SSH (com VPN se fora de casa) → <code>tmux attach -t manutnavio</code></li>
+    <li><strong>Atualizar:</strong> <code>cd /mnt/projects/financaonboard && git pull</code></li>
+    <li><strong>Programar:</strong> editar pelo VS Code Remote-SSH ou direto no terminal</li>
+    <li><strong>Testar:</strong> rodar comandos de teste/build dentro do tmux</li>
+    <li><strong>Commitar:</strong> <code>git add . && git commit -m "msg" && git push</code></li>
+    <li><strong>Deploy backend</strong> (se mudou backend): <code>bash infra/deploy.sh</code></li>
+    <li><strong>Sair:</strong> <kbd>Ctrl</kbd>+<kbd>B</kbd> <kbd>D</kbd> (mantém tudo rodando) → <code>exit</code> SSH</li>
+  </ol>
+
+  <div class="card success" style="text-align:center;margin-top:24px">
+    <h3 style="margin-top:0;color:var(--green)">Você está pronto.</h3>
+    <p style="margin:0">Esse fluxo já é automático para você. Esse guia é só pra emergências e referência futura.</p>
+    <p style="margin-top:12px;color:var(--text-soft);font-size:11px">Yellow VPN · Davi Mendes · Maio 2026 · v1.2</p>
+  </div>
+
+  <div class="footer">
+    <span>08 · Cheat Sheet</span>
+    <span>9 / 9</span>
+  </div>
+</div>
+
+</body>
+</html>

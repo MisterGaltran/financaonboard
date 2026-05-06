@@ -1,6 +1,6 @@
 # Deploy do Finanças OnBoard no Yellow
 
-Guia operacional para subir o app 24/7. Plano completo de arquitetura está em `~/.claude/plans/desejo-fazer-com-que-twinkling-panda.md` (na máquina de desenvolvimento).
+Guia operacional para subir o app 24/7. Arquitetura final usando **Tailscale Funnel** (depois que descobrimos que o ISP residencial filtra inbound TCP 443).
 
 ## Arquitetura
 
@@ -9,16 +9,21 @@ Guia operacional para subir o app 24/7. Plano completo de arquitetura está em `
                               │
                               │ fetch + wss
                               ▼
-                       [Caddy :443] ──> [Node :4000]
-                       api.davi-mendes.dedyn.io     Yellow / systemd
+                       [Tailscale Funnel] ── outbound tunnel ──> [Node :4000]
+                       https://yellow-vpn.tailf47dec.ts.net      Yellow / systemd
 ```
+
+Por que Tailscale Funnel em vez de Caddy + porta forwarding:
+- Conexão é **outbound** do Yellow → Tailscale, não depende de portas abertas no Nokia.
+- Contorna filtros do ISP Oi que dropam inbound TCP 443 pra IPs residenciais brasileiros.
+- TLS terminado no edge do Tailscale, certificados Let's Encrypt automáticos.
+- Custo: R$ 0/mês.
 
 ## Arquivos neste diretório
 
 | Arquivo                        | Destino no Yellow                                     |
 | ------------------------------ | ----------------------------------------------------- |
 | `financaonboard-api.service`   | `/etc/systemd/system/financaonboard-api.service`      |
-| `Caddyfile`                    | `/etc/caddy/Caddyfile`                                |
 | `deploy.sh`                    | executar in-place: `bash infra/deploy.sh`             |
 
 ## Setup inicial (executar uma vez)
@@ -48,73 +53,59 @@ chmod 600 /mnt/projects/financaonboard/backend/.env
 nano /mnt/projects/financaonboard/backend/.env
 # trocar:
 #   NODE_ENV=production
-#   FRONTEND_URL=https://financaonboard.pages.dev   (ajustar para o domínio real do Pages)
+#   FRONTEND_URL=https://financaonboard.pages.dev
 ```
 
-### 3. Instalar systemd unit
+### 3. Instalar systemd unit do backend
 
 ```bash
 sudo cp /mnt/projects/financaonboard/infra/financaonboard-api.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now financaonboard-api.service
 sudo systemctl status financaonboard-api.service
-journalctl -u financaonboard-api.service -f --since "2 min ago"
 ```
 
-Validar local na LAN:
+Validar localmente:
 
 ```bash
-curl http://192.168.1.50:4000/health
+curl http://localhost:4000/health
 ```
 
-### 4. Adicionar CNAME no deSEC
-
-Painel: https://desec.io/domains → davi-mendes.dedyn.io → Add record
-
-```
-Type:    CNAME
-Subname: api
-Target:  davi-mendes.dedyn.io.
-TTL:     3600
-```
-
-Validar (até 1h de propagação):
+### 4. Instalar e configurar Tailscale
 
 ```bash
-dig api.davi-mendes.dedyn.io +short
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up
 ```
 
-### 5. Instalar Caddy
+O comando imprime uma URL de auth — abra no navegador, faça login (Google/GitHub).
+
+### 5. Habilitar Funnel no admin do Tailscale
+
+1. https://login.tailscale.com/admin → **DNS** → habilita HTTPS Certificates (botão "Enable HTTPS").
+2. **Access controls** (ACLs) → adiciona no JSON:
+   ```json
+   "nodeAttrs": [
+     { "target": ["MisterGaltran@"], "attr": ["funnel"] }
+   ]
+   ```
+3. Se aparecer aviso "list of allowed nodes does not include...", abre o link de opt-in que o `tailscale funnel` imprimiu e aprova esse nó específico.
+
+### 6. Configurar Funnel apontando pro backend
 
 ```bash
-sudo apt update
-sudo apt install -y caddy
-sudo cp /mnt/projects/financaonboard/infra/Caddyfile /etc/caddy/Caddyfile
-sudo systemctl reload caddy
-sudo systemctl status caddy
-journalctl -u caddy -n 50 --no-pager
+sudo tailscale funnel --bg 4000
+sudo tailscale cert yellow-vpn.<seu-tailnet>.ts.net   # força emissão do TLS na primeira vez
+tailscale funnel status
 ```
 
-### 6. Abrir portas no roteador Nokia
+Vai sair a URL pública: `https://yellow-vpn.<seu-tailnet>.ts.net`. **Anota essa URL** — vai ser o backend público.
 
-Painel: http://192.168.1.1 → Forward Rules / Port Forwarding
-
-| Porta externa | Protocolo | IP interno     | Porta interna |
-| ------------- | --------- | -------------- | ------------- |
-| 80            | TCP       | 192.168.1.50   | 80            |
-| 443           | TCP       | 192.168.1.50   | 443           |
-
-Validar de fora da rede (4G no celular sem VPN):
-
-```bash
-curl -I https://api.davi-mendes.dedyn.io/health
-```
-
-Esperado: `HTTP/2 200` com certificado válido.
+> **Importante:** se o Funnel reclamar de "address already in use" na 443, é porque o Caddy está bindando ainda. Pare e desabilite com `sudo systemctl stop caddy && sudo systemctl disable caddy`.
 
 ### 7. Deploy do frontend no Cloudflare Pages
 
-1. https://pages.cloudflare.com → Create project → Connect to Git → escolher `financaonboard`.
+1. https://pages.cloudflare.com → Create project → Connect to Git → `financaonboard`.
 2. Build settings:
    - Framework preset: **Vite**
    - Build command: `npm run build`
@@ -122,75 +113,66 @@ Esperado: `HTTP/2 200` com certificado válido.
    - Root directory: `frontend`
    - Node version: `20`
 3. Environment variables (Production) — copiar de `frontend/.env.production.example`:
-   - `VITE_BACKEND_URL=https://api.davi-mendes.dedyn.io`
+   - `VITE_BACKEND_URL=https://yellow-vpn.<seu-tailnet>.ts.net`
    - `VITE_WS_RECONNECT_DELAY=1000`
    - `VITE_WS_RECONNECT_DELAY_MAX=15000`
-4. Save and Deploy. Aguardar build (~1-2 min) → site fica em `https://<projeto>.pages.dev`.
+4. Save and Deploy.
 
-### 8. Atualizar `FRONTEND_URL` com o domínio real do Pages
+### 8. Validar end-to-end
 
 ```bash
-ssh yellow-vpn
-nano /mnt/projects/financaonboard/backend/.env
-# FRONTEND_URL=https://<projeto>.pages.dev
-sudo systemctl restart financaonboard-api.service
+# de qualquer rede (4G ou outro Wi-Fi):
+curl -I https://yellow-vpn.<seu-tailnet>.ts.net/health
+# HTTP/2 200 esperado
 ```
 
-## Atualizações futuras (deploy de novas versões)
+Abre `https://financaonboard.pages.dev` no navegador.
 
-Frontend:  `git push origin main` → Cloudflare Pages rebuilda sozinho.
+## Atualizações futuras
 
-Backend:
+**Frontend:** `git push origin main` → Cloudflare Pages rebuilda sozinho.
+
+**Backend:**
 
 ```bash
 ssh yellow-vpn
 bash /mnt/projects/financaonboard/infra/deploy.sh
 ```
 
-Equivalente a: `git pull` + `npm ci --omit=dev` + `systemctl restart`.
+Equivalente a: `git pull` + `npm ci --omit=dev` + `systemctl restart financaonboard-api`.
 
 ## Operação
 
-Logs do backend:
-
 ```bash
+# Logs ao vivo
 journalctl -u financaonboard-api -f
-```
+journalctl -u tailscaled -f
 
-Logs do Caddy:
+# Status
+systemctl is-active financaonboard-api tailscaled
+tailscale funnel status
 
-```bash
-journalctl -u caddy -f
-```
-
-Status geral:
-
-```bash
-systemctl is-active financaonboard-api caddy
-```
-
-Saúde de recursos (`§10` do INFRA-YELLOW):
-
-```bash
-free -h
-htop
+# Saúde de recursos
+free -h && df -h /mnt/projects
 journalctl -p err -n 50
 ```
 
 ## Rollback
 
-Se um deploy quebra:
-
 ```bash
 cd /mnt/projects/financaonboard
-git log --oneline -5                    # ver commits recentes
-git checkout <commit-hash-anterior>     # voltar pra versão estável
+git log --oneline -5
+git checkout <commit-hash-anterior>
 cd backend && npm ci --omit=dev
 sudo systemctl restart financaonboard-api
-```
-
-Quando estabilizar, voltar pro main:
-
-```bash
+# voltar pra main quando estabilizar:
 cd /mnt/projects/financaonboard && git checkout main
 ```
+
+## Histórico
+
+A versão inicial deste setup usava Caddy + DNS-01 challenge no domínio `davi-mendes.dedyn.io`. Funcionou da LAN do Davi (via hairpin NAT do Nokia), mas falhou de verdade publicamente porque o ISP Oi filtra inbound TCP 443 pra IPs residenciais brasileiros (testado via check-host.net: 99% dos nós davam timeout, só Ucrânia conectou).
+
+A migração para Tailscale Funnel resolveu o problema usando conexão outbound do Yellow → Tailscale → público. Caddy e o token deSEC ficaram instalados mas inativos:
+- Caddy: `sudo systemctl status caddy` deve estar `inactive (dead)`. Pra remover de vez: `sudo systemctl disable caddy && sudo apt remove caddy`.
+- Token deSEC em `/etc/caddy/desec.env`: pode ser revogado em https://desec.io/tokens (não tem mais uso). O DDNS do WireGuard usa um token diferente em `/home/davi/desec/update.sh`, deixa esse intacto.
