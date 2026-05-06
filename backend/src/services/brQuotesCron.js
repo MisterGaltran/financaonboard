@@ -3,7 +3,7 @@ const { logger } = require('../utils/logger');
 const { SOCKET_EVENTS, ROOMS } = require('../config/constants');
 const brapi = require('./brapiService');
 
-const REFRESH_MS = env.hasBrapi ? 10_000 : 120_000;
+const REFRESH_MS = env.hasBrapi ? 30_000 : 120_000;
 const LIST_LIMIT = 100;
 
 let latest = [];
@@ -14,13 +14,18 @@ async function refresh(io) {
   if (refreshing) return;
   refreshing = true;
   try {
-    const quotes = await brapi.getIbovList({ limit: LIST_LIMIT });
+    let quotes = await brapi.getIbovList({ limit: LIST_LIMIT });
+    // Fallback: if list endpoint is rate-limited, fetch default tickers individually
+    if (!quotes.length && latest.length === 0) {
+      logger.info('BR list empty — falling back to default tickers');
+      quotes = await brapi.getQuotes(brapi.getWatchlist());
+    }
     if (quotes.length) {
       latest = quotes;
       if (io) io.to(ROOMS.QUOTES).emit(SOCKET_EVENTS.QUOTES_BR_UPDATE, latest);
-      logger.info(`BR quotes refreshed: ${quotes.length} symbols (top-${LIST_LIMIT} by volume)`);
-    } else {
-      logger.warn('BR quotes refresh returned 0 — keeping previous cache');
+      logger.info(`BR quotes refreshed: ${quotes.length} symbols`);
+    } else if (latest.length === 0) {
+      logger.warn('BR quotes refresh returned 0 — no cache available');
     }
   } catch (err) {
     logger.error('BR quotes refresh failed', err.message);
