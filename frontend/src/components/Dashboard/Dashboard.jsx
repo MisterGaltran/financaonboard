@@ -4,36 +4,49 @@ import BrazilQuotes from '../BrazilQuotes/BrazilQuotes';
 import NewsTicker from '../NewsTicker/NewsTicker';
 import Watchlist from '../Watchlist/Watchlist';
 import StatusBar from './StatusBar';
+import MarketClock from './MarketClock';
 
 export default function Dashboard({ onOpenPalette }) {
   return (
-    <div className="h-screen flex flex-col bg-bbg-bg text-bbg-amber font-mono text-bbg-sm">
-      <header className="flex items-center justify-between px-3 py-1.5 bg-bbg-panel border-b border-bbg-border-hi">
-        <div className="flex items-center gap-2">
-          <div className="w-1 h-5 bg-bbg-amber" />
-          <span className="text-bbg-white text-bbg-sm font-bold tracking-[0.2em]">FINANCA ONBOARD</span>
-          <span className="text-bbg-muted text-bbg-xs tracking-wider">// TRADING TERMINAL</span>
-        </div>
-        <div className="flex items-center gap-3">
+    <div className="h-screen flex flex-col bg-surface text-text-primary font-sans text-ui-base">
+      {/* Header */}
+      <header className="bg-surface-alt border-b border-border-hi">
+        {/* Top row: Logo + Market Clock + Search */}
+        <div className="flex items-center justify-between px-4 py-2">
+          <div className="flex items-center gap-2.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-accent" />
+            <span className="text-text-primary text-ui-sm font-semibold tracking-[0.15em]">
+              FINANCA ONBOARD
+            </span>
+          </div>
+
+          <MarketClock />
+
           <button
             onClick={onOpenPalette}
-            className="flex items-center gap-2 px-2 py-0.5 bg-black border border-bbg-border hover:border-bbg-amber text-bbg-muted hover:text-bbg-amber text-bbg-xs tracking-widest"
+            className="flex items-center gap-2 px-2.5 py-1 rounded bg-surface border border-border hover:border-accent text-text-secondary hover:text-accent text-ui-xs tracking-wider"
           >
-            <span>⌕</span>
-            <span>SEARCH</span>
-            <span className="text-[9px] text-bbg-muted border border-bbg-border px-1 ml-1">CTRL+K</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <span className="text-text-secondary/60 text-[10px] border border-border rounded px-1">Ctrl+K</span>
           </button>
-          <div className="text-bbg-xs text-bbg-muted tabular-nums tracking-wider">
+        </div>
+
+        {/* Bottom row: Providers */}
+        <div className="flex items-center justify-between px-4 py-1 border-t border-border">
+          <StatusBar />
+          <div className="text-ui-xs text-text-secondary tabular-nums tracking-wider">
             {new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()}
           </div>
         </div>
       </header>
 
-      <StatusBar />
       <Watchlist />
       <BrazilQuotes />
 
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-px bg-bbg-border overflow-hidden">
+      <main className="flex-1 grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-px bg-border overflow-hidden">
         <EconomicCalendar />
         <NewsFeed />
       </main>
