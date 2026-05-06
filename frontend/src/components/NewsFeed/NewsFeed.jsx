@@ -4,6 +4,7 @@ import { useNewsFilterStore } from '../../store/newsFilterStore';
 import { fetchNews } from '../../services/apiClient';
 import { fmtDateTime, impactClass, impactLabel, IMPACT_BADGE_CLASS } from '../../utils/formatters';
 import NewsFilter from './NewsFilter';
+import NewsCard from './NewsCard';
 
 export default function NewsFeed() {
   const items = useNewsStore((s) => s.items);
@@ -11,6 +12,7 @@ export default function NewsFeed() {
   const languages = useNewsFilterStore((s) => s.languages);
   const sources = useNewsFilterStore((s) => s.sources);
   const hideLow = useNewsFilterStore((s) => s.hideLowImpact);
+  const [selectedNews, setSelectedNews] = useState(null);
 
   useEffect(() => {
     if (items.length === 0) {
@@ -56,7 +58,11 @@ export default function NewsFeed() {
           const highlight = isFresh ? 'border-l-2 border-l-accent' : 'border-l-2 border-l-transparent';
           const dim = isStale ? 'opacity-70' : '';
           return (
-            <article key={n.id} className={`pl-3 pr-4 py-2 border-b border-border/40 row-hover ${highlight} ${dim} animate-fade-in`}>
+            <article
+              key={n.id}
+              onClick={() => setSelectedNews(n)}
+              className={`pl-3 pr-4 py-2 border-b border-border/40 row-hover cursor-pointer ${highlight} ${dim} animate-fade-in`}
+            >
               <div className="flex items-center gap-2 text-ui-xs text-text-secondary tracking-wider">
                 <span className="tabular-nums text-info">{fmtDateTime(n.datetime)}</span>
                 {isFresh && <span className="text-accent font-semibold">NEW</span>}
@@ -68,13 +74,9 @@ export default function NewsFeed() {
                   </span>
                 </span>
               </div>
-              {n.url ? (
-                <a href={n.url} target="_blank" rel="noreferrer" className="block text-ui-base leading-snug text-text-primary hover:text-accent-light mt-0.5">
-                  {n.headline}
-                </a>
-              ) : (
-                <div className="text-ui-base leading-snug text-text-primary mt-0.5">{n.headline}</div>
-              )}
+              <div className="text-ui-base leading-snug text-text-primary hover:text-accent-light mt-0.5">
+                {n.headline}
+              </div>
               {n.tickers?.length ? (
                 <div className="mt-1 flex flex-wrap gap-1">
                   {n.tickers.slice(0, 8).map((t) => (
@@ -86,6 +88,10 @@ export default function NewsFeed() {
           );
         })}
       </div>
+
+      {selectedNews && (
+        <NewsCard news={selectedNews} onClose={() => setSelectedNews(null)} />
+      )}
     </div>
   );
 }
