@@ -7,7 +7,7 @@ const env = {
   EODHD_API_KEY: process.env.EODHD_API_KEY || '',
 
   POLYGON_API_KEY: process.env.POLYGON_API_KEY || '',
-  POLYGON_WS_URL: process.env.POLYGON_WS_URL || 'wss://socket.polygon.io/stocks',
+  POLYGON_WS_URL: process.env.POLYGON_WS_URL || 'wss://socket.massive.com/stocks',
 
   CALENDAR_REFRESH_CRON: process.env.CALENDAR_REFRESH_CRON || '*/5 * * * *',
 

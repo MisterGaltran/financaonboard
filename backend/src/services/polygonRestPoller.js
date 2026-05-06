@@ -10,7 +10,7 @@ class PolygonRestPoller extends EventEmitter {
   constructor() {
     super();
     this.client = axios.create({
-      baseURL: 'https://api.polygon.io',
+      baseURL: 'https://api.massive.com',
       timeout: 10_000
     });
     this.client.interceptors.request.use((cfg) => {
