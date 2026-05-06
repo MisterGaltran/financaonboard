@@ -5,20 +5,30 @@
 html, body, #root {
   height: 100%;
   margin: 0;
-  background: #000;
-  color: #FFB800;
+  background: #0a0a0f;
+  color: #e1e1e6;
 }
 
 body {
-  font-family: 'JetBrains Mono', 'IBM Plex Mono', 'Consolas', 'Courier New', monospace;
-  font-feature-settings: 'tnum' 1, 'zero' 1;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-*::-webkit-scrollbar { width: 6px; height: 6px; }
-*::-webkit-scrollbar-track { background: #000; }
-*::-webkit-scrollbar-thumb { background: #2A2A2A; }
-*::-webkit-scrollbar-thumb:hover { background: #404040; }
+/* Smooth transitions on all interactive elements */
+button, a, [role="button"] {
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease, opacity 150ms ease;
+}
 
+/* Custom scrollbar */
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track { background: #0a0a0f; }
+*::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 3px; }
+*::-webkit-scrollbar-thumb:hover { background: #3a3a4a; }
+
+/* Marquee animation */
 @keyframes marquee-scroll {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
@@ -33,4 +43,16 @@ body {
   animation-play-state: paused;
 }
 
-.bbg-row-hover:hover { background: #141414; }
+/* Row hover */
+.row-hover:hover { background: #1a1a25; }
+
+/* Skeleton loading */
+.skeleton {
+  background: #1a1a25;
+  border-radius: 4px;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}

@@ -5,76 +5,86 @@ export default {
   theme: {
     extend: {
       colors: {
-        // ═══ Bloomberg palette (novo, canônico) ═══
-        'bbg-bg':        '#000000',  // fundo preto profundo
-        'bbg-panel':     '#0A0A0A',  // fundo de tiles (quase preto)
-        'bbg-panel-alt': '#141414',  // stripe row alternado
-        'bbg-border':    '#2A2A2A',  // 1px divisor entre tiles
-        'bbg-border-hi': '#404040',  // divisor de header
+        // ═══ New semantic palette ═══
+        'surface':       '#0a0a0f',
+        'surface-alt':   '#12121a',
+        'surface-hover': '#1a1a25',
+        'border':        '#1e1e2e',
+        'border-hi':     '#2a2a3a',
 
-        'bbg-amber':     '#FFB800',  // texto primário (clássico Bloomberg)
-        'bbg-amber-dim': '#B87A00',  // texto secundário
-        'bbg-white':     '#FFFFFF',  // headers / dados em destaque
-        'bbg-muted':     '#6E7681',  // labels menos importantes
-        'bbg-cyan':      '#55D4FF',  // acentos neutros (ex: hora, links)
+        'text-primary':   '#e1e1e6',
+        'text-secondary': '#6b6b80',
 
-        'bbg-green':     '#00FF5F',  // variação positiva
-        'bbg-green-dim': '#007F2F',  // fundo tênue de flash up
-        'bbg-red':       '#FF3350',  // variação negativa
-        'bbg-red-dim':   '#7F1928',  // fundo tênue de flash down
-        'bbg-yellow':    '#FFD700',  // impacto médio / destaque
+        'accent':       '#6366f1',
+        'accent-light': '#818cf8',
 
-        // ═══ Legacy tokens mantidos (componentes atuais) ═══
-        'trade-bg':     '#0B0E11',
-        'trade-panel':  '#161B22',
-        'trade-border': '#21262D',
-        'trade-text':   '#E6EDF3',
-        'trade-muted':  '#8B949E',
-        'impact-high':  '#F85149',
-        'impact-mid':   '#E3B341',
-        'impact-low':   '#6E7681'
+        'positive':     '#22c55e',
+        'positive-dim': '#15803d',
+        'negative':     '#ef4444',
+        'negative-dim': '#991b1b',
+        'warning':      '#f59e0b',
+        'info':         '#38bdf8',
+
+        // ═══ Legacy aliases (removed after migration) ═══
+        'bbg-bg':        '#0a0a0f',
+        'bbg-panel':     '#12121a',
+        'bbg-panel-alt': '#1a1a25',
+        'bbg-border':    '#1e1e2e',
+        'bbg-border-hi': '#2a2a3a',
+        'bbg-amber':     '#e1e1e6',
+        'bbg-amber-dim': '#6b6b80',
+        'bbg-white':     '#e1e1e6',
+        'bbg-muted':     '#6b6b80',
+        'bbg-cyan':      '#38bdf8',
+        'bbg-green':     '#22c55e',
+        'bbg-green-dim': '#15803d',
+        'bbg-red':       '#ef4444',
+        'bbg-red-dim':   '#991b1b',
+        'bbg-yellow':    '#f59e0b',
       },
       fontFamily: {
-        // Monospace rigoroso Bloomberg-style
-        mono: [
-          'JetBrains Mono',
-          'IBM Plex Mono',
-          'Fira Code',
-          'Consolas',
-          '"Courier New"',
-          'monospace'
-        ]
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
       },
       fontSize: {
-        'bbg-xs':  ['10px', { lineHeight: '13px' }],
-        'bbg-sm':  ['11px', { lineHeight: '15px' }],
-        'bbg-md':  ['13px', { lineHeight: '17px' }]
+        'ui-xs':   ['11px', { lineHeight: '14px' }],
+        'ui-sm':   ['12px', { lineHeight: '16px' }],
+        'ui-base': ['13px', { lineHeight: '18px' }],
       },
       keyframes: {
         'flash-up': {
-          '0%':   { backgroundColor: 'rgba(0, 255, 95, 0.40)' },
-          '100%': { backgroundColor: 'rgba(0, 255, 95, 0)' }
+          '0%':   { backgroundColor: 'rgba(34, 197, 94, 0.35)' },
+          '100%': { backgroundColor: 'rgba(34, 197, 94, 0)' },
         },
         'flash-down': {
-          '0%':   { backgroundColor: 'rgba(255, 51, 80, 0.40)' },
-          '100%': { backgroundColor: 'rgba(255, 51, 80, 0)' }
+          '0%':   { backgroundColor: 'rgba(239, 68, 68, 0.35)' },
+          '100%': { backgroundColor: 'rgba(239, 68, 68, 0)' },
         },
         'border-pulse': {
-          '0%, 100%': { borderColor: '#FF3350', boxShadow: '0 0 0 0 rgba(255, 51, 80, 0.6)' },
-          '50%':      { borderColor: '#FFB800', boxShadow: '0 0 24px 4px rgba(255, 51, 80, 0.4)' }
+          '0%, 100%': { borderColor: '#ef4444', boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.6)' },
+          '50%':      { borderColor: '#f59e0b', boxShadow: '0 0 24px 4px rgba(239, 68, 68, 0.4)' },
         },
         'ticker-scroll': {
           from: { transform: 'translateX(0)' },
-          to:   { transform: 'translateX(-50%)' }
-        }
+          to:   { transform: 'translateX(-50%)' },
+        },
+        'fade-in': {
+          from: { opacity: '0' },
+          to:   { opacity: '1' },
+        },
+        'skeleton-pulse': {
+          '0%, 100%': { opacity: '0.4' },
+          '50%':      { opacity: '1' },
+        },
       },
       animation: {
-        'flash-up':     'flash-up 300ms ease-out 1',
-        'flash-down':   'flash-down 300ms ease-out 1',
-        'border-pulse': 'border-pulse 1.1s ease-in-out infinite',
-        'ticker':       'ticker-scroll var(--ticker-duration, 240s) linear infinite'
-      }
-    }
+        'flash-up':       'flash-up 300ms ease-out 1',
+        'flash-down':     'flash-down 300ms ease-out 1',
+        'border-pulse':   'border-pulse 1.1s ease-in-out infinite',
+        'ticker':         'ticker-scroll var(--ticker-duration, 240s) linear infinite',
+        'fade-in':        'fade-in 300ms ease-out',
+        'skeleton-pulse': 'skeleton-pulse 1.5s ease-in-out infinite',
+      },
+    },
   },
-  plugins: []
+  plugins: [],
 };
