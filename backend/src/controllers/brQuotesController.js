@@ -1,4 +1,4 @@
-const brapi = require('../services/brapiService');
+const yahoo = require('../services/yahooQuotesService');
 const { getLatestBrQuotes, refresh } = require('../services/brQuotesCron');
 
 async function getBrQuotes(req, res, next) {
@@ -8,7 +8,7 @@ async function getBrQuotes(req, res, next) {
       : null;
 
     if (custom) {
-      const quotes = await brapi.getQuotes(custom);
+      const quotes = await yahoo.getQuotesBatch(custom);
       return res.json({ count: quotes.length, tickers: custom, quotes });
     }
 
@@ -17,7 +17,7 @@ async function getBrQuotes(req, res, next) {
       await refresh();
       quotes = getLatestBrQuotes();
     }
-    res.json({ count: quotes.length, tickers: brapi.getWatchlist(), quotes });
+    res.json({ count: quotes.length, quotes });
   } catch (err) { next(err); }
 }
 
