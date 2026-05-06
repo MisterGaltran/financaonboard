@@ -6,6 +6,7 @@ const { SOCKET_EVENTS, ROOMS, IMPACT, BR_RSS_FEEDS } = require('../config/consta
 const { inferImpactFromText } = require('../utils/impact');
 
 const MAX_SEEN = 800;
+const MAX_CACHE = 200;
 
 class BrRssPoller {
   constructor(io) {
@@ -13,9 +14,14 @@ class BrRssPoller {
     this.parser = new Parser({ timeout: 8_000, headers: { 'User-Agent': 'FinancaOnboard/1.0 (+local)' } });
     this.seen = new Set();
     this.seenHeadlines = new Set();
+    this.cache = [];
     this.timer = null;
     this.stopped = false;
     this.firstRun = true;
+  }
+
+  getRecent(limit = 50) {
+    return this.cache.slice(0, limit);
   }
 
   _idFor(item, feedName) {
@@ -72,6 +78,8 @@ class BrRssPoller {
         if (this.seenHeadlines.has(headlineKey)) continue;
         this.seen.add(news.id);
         this.seenHeadlines.add(headlineKey);
+        this.cache.unshift(news);
+        if (this.cache.length > MAX_CACHE) this.cache.length = MAX_CACHE;
         this._emit(news);
         emittedCount += 1;
       }
@@ -104,10 +112,17 @@ class BrRssPoller {
   }
 }
 
+let globalPoller = null;
+
 function startBrRssPoller(io) {
   const poller = new BrRssPoller(io);
   poller.start();
+  globalPoller = poller;
   return poller;
 }
 
-module.exports = { startBrRssPoller, BrRssPoller };
+function getRecentBrNews(limit = 50) {
+  return globalPoller ? globalPoller.getRecent(limit) : [];
+}
+
+module.exports = { startBrRssPoller, BrRssPoller, getRecentBrNews };

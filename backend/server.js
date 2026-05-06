@@ -5,7 +5,6 @@ const { createApp } = require('./src/app');
 const { env } = require('./src/config/env');
 const { logger } = require('./src/utils/logger');
 const { ROOMS } = require('./src/config/constants');
-const { startPolygonBridge } = require('./src/websocket/polygonBridge');
 const { startCalendarCron } = require('./src/services/calendarCron');
 const { startBrRssPoller } = require('./src/services/brRssPoller');
 const { startBrQuotesCron } = require('./src/services/brQuotesCron');
@@ -26,7 +25,6 @@ io.on('connection', (socket) => {
   socket.emit('provider:status', {
     finnhub: env.hasFinnhub ? 'ready' : 'disabled',
     eodhd: env.hasEodhd ? 'ready' : 'disabled',
-    polygon: env.hasPolygon ? 'ready' : 'disabled',
     brapi: env.hasBrapi ? 'ready' : 'no-token',
     brRss: 'polling'
   });
@@ -36,7 +34,6 @@ io.on('connection', (socket) => {
 const app = createApp({ io });
 httpServer.on('request', app);
 
-startPolygonBridge(io);
 startCalendarCron(io);
 startBrRssPoller(io);
 startBrQuotesCron(io);
@@ -46,7 +43,7 @@ startIndicesCron(io);
 httpServer.listen(env.PORT, () => {
   logger.info(`HTTP + Socket.io listening on :${env.PORT}`);
   logger.info(`CORS allowing origin: ${env.FRONTEND_URL}`);
-  logger.info(`providers → finnhub:${env.hasFinnhub} eodhd:${env.hasEodhd} polygon:${env.hasPolygon}`);
+  logger.info(`providers → finnhub:${env.hasFinnhub} eodhd:${env.hasEodhd} brapi:${env.hasBrapi}`);
 });
 
 const shutdown = (signal) => {

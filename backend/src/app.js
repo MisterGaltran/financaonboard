@@ -25,7 +25,6 @@ function createApp({ io }) {
       providers: {
         finnhub: env.hasFinnhub,
         eodhd: env.hasEodhd,
-        polygon: env.hasPolygon,
         brapi: env.hasBrapi
       }
     });

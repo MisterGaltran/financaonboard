@@ -6,9 +6,6 @@ const env = {
   FINNHUB_API_KEY: process.env.FINNHUB_API_KEY || '',
   EODHD_API_KEY: process.env.EODHD_API_KEY || '',
 
-  POLYGON_API_KEY: process.env.POLYGON_API_KEY || '',
-  POLYGON_WS_URL: process.env.POLYGON_WS_URL || 'wss://socket.massive.com/stocks',
-
   CALENDAR_REFRESH_CRON: process.env.CALENDAR_REFRESH_CRON || '*/5 * * * *',
 
   BRAPI_API_KEY: process.env.BRAPI_API_KEY || '',
@@ -23,7 +20,6 @@ const isPlaceholder = (v) => !v || v.startsWith('your_') || v.includes('_here');
 
 env.hasFinnhub = !isPlaceholder(env.FINNHUB_API_KEY);
 env.hasEodhd = !isPlaceholder(env.EODHD_API_KEY);
-env.hasPolygon = !isPlaceholder(env.POLYGON_API_KEY);
 env.hasBrapi = !isPlaceholder(env.BRAPI_API_KEY);
 
 module.exports = { env };
