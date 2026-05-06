@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Tutorial — Operação do Finanças OnBoard</title>
+<style>
+  :root {
+    --bg: #0e1729;
+    --bg-2: #142037;
+    --bg-card: #1a2640;
+    --bg-code: #0a1224;
+    --text: #e6ecf6;
+    --text-soft: #94a3b8;
+    --text-dim: #64748b;
+    --yellow: #f5b800;
+    --yellow-dim: #c79900;
+    --blue: #3b82f6;
+    --green: #10b981;
+    --red: #ef4444;
+    --border: #1f2d4d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 48px 56px;
+    page-break-after: always;
+    min-height: 100vh;
+  }
+  .page:last-child { page-break-after: auto; }
+  h1 {
+    font-size: 38px;
+    line-height: 1.1;
+    margin: 12px 0 8px;
+    font-weight: 800;
+  }
+  h1 .accent { color: var(--yellow); }
+  h2 {
+    font-size: 20px;
+    margin: 28px 0 12px;
+    font-weight: 700;
+    color: var(--yellow);
+  }
+  h2 .num { color: var(--text); margin-right: 6px; }
+  h3 {
+    font-size: 15px;
+    margin: 20px 0 8px;
+    font-weight: 700;
+  }
+  p { margin: 8px 0; }
+  .subtitle {
+    color: var(--text-soft);
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--bg-card);
+    color: var(--yellow);
+    border: 1px solid var(--yellow-dim);
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .badge.green { color: var(--green); border-color: var(--green); }
+  .badge.blue  { color: var(--blue);  border-color: var(--blue); }
+  .badge.red   { color: var(--red);   border-color: var(--red); }
+  pre, code {
+    font-family: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+  }
+  pre {
+    background: var(--bg-code);
+    color: #cdd9ed;
+    padding: 12px 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 12px;
+    border: 1px solid var(--border);
+    margin: 10px 0;
+  }
+  code {
+    background: var(--bg-code);
+    color: #f5b800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 12px 0;
+  }
+  .card.warning  { border-color: var(--yellow-dim); background: linear-gradient(180deg, #2a1f0a, #1a2640); }
+  .card.danger   { border-color: var(--red); background: linear-gradient(180deg, #2a0e0e, #1a2640); }
+  .card.tip      { border-color: var(--blue); background: linear-gradient(180deg, #0e1a2a, #1a2640); }
+  .card.success  { border-color: var(--green); background: linear-gradient(180deg, #0e2a1a, #1a2640); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 12px;
+  }
+  th {
+    text-align: left;
+    background: var(--bg-2);
+    color: var(--text-soft);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  ul, ol { padding-left: 22px; margin: 8px 0; }
+  li { margin: 4px 0; }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 12px 0;
+  }
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin: 24px 0;
+  }
+  .stat {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+  }
+  .stat .big { font-size: 22px; font-weight: 800; color: var(--yellow); }
+  .stat .label { font-size: 10px; letter-spacing: 1px; color: var(--text-soft); text-transform: uppercase; margin-top: 4px; }
+  .toc {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+  .toc-row {
+    display: flex;
+    align-items: baseline;
+    border-bottom: 1px dotted var(--border);
+    padding: 6px 0;
+    gap: 12px;
+  }
+  .toc-row:last-child { border-bottom: none; }
+  .toc-num {
+    color: var(--yellow);
+    font-weight: 800;
+    min-width: 28px;
+  }
+  .toc-title {
+    flex: 1;
+    font-weight: 600;
+  }
+  .toc-desc {
+    color: var(--text-soft);
+    font-style: italic;
+    font-size: 12px;
+  }
+  .toc-page {
+    color: var(--yellow);
+    font-weight: 700;
+    margin-left: 12px;
+  }
+  .footer {
+    margin-top: 36px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 11px;
+    display: flex;
+    justify-content: space-between;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 24px 0;
+  }
+  .arrow { color: var(--yellow); }
+
+  @media print {
+    @page { size: A4; margin: 12mm; }
+    body { background: white; color: #111; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { background: var(--bg); min-height: auto; padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div class="page">
+  <span class="badge">TUTORIAL · V1.0</span>
+  <h1>Finanças <span class="accent">OnBoard</span><br>Operação 24/7</h1>
+  <p class="subtitle">Como manter o app no ar, atualizar, monitorar e diagnosticar problemas. Tudo que você precisa saber sem perguntar pra ninguém.</p>
+
+  <div class="grid-4">
+    <div class="stat"><div class="big">24/7</div><div class="label">Backend Online</div></div>
+    <div class="stat"><div class="big">CDN</div><div class="label">Frontend Global</div></div>
+    <div class="stat"><div class="big">~60d</div><div class="label">Renovação TLS Auto</div></div>
+    <div class="stat"><div class="big">R$ 0</div><div class="label">Custo Mensal</div></div>
+  </div>
+
+  <h2><span class="num">§</span>Arquitetura em uma imagem</h2>
+  <pre>[navegador]
+    │ HTTPS
+    ▼
+[Cloudflare Pages]   →   financaonboard.pages.dev   (frontend Vite estático)
+    │
+    │ fetch + WebSocket (wss://)
+    ▼
+[Caddy 2.11 + plugin desec]   →   davi-mendes.dedyn.io:443
+    │  TLS Let's Encrypt automático (DNS-01 challenge)
+    ▼
+[Node 20 + Express + Socket.io]   →   localhost:4000
+    │  systemd unit: financaonboard-api.service
+    ▼
+[Yellow / Debian 13 ARM64 / 4GB RAM]
+   /mnt/projects/financaonboard/backend</pre>
+
+  <h2><span class="num">§</span>Índice</h2>
+  <div class="toc">
+    <div class="toc-row"><span class="toc-num">01</span><span class="toc-title">Atualizar o app (frontend e backend)</span><span class="toc-desc">Push → deploy</span><span class="toc-page">P. 2</span></div>
+    <div class="toc-row"><span class="toc-num">02</span><span class="toc-title">Monitorar e diagnosticar</span><span class="toc-desc">Logs, status, saúde</span><span class="toc-page">P. 3</span></div>
+    <div class="toc-row"><span class="toc-num">03</span><span class="toc-title">Onde tudo está armazenado</span><span class="toc-desc">Arquivos, secrets, paths</span><span class="toc-page">P. 4</span></div>
+    <div class="toc-row"><span class="toc-num">04</span><span class="toc-title">Troubleshooting</span><span class="toc-desc">App caiu, TLS não renovou, etc.</span><span class="toc-page">P. 5</span></div>
+    <div class="toc-row"><span class="toc-num">05</span><span class="toc-title">Adicionar um segundo backend público</span><span class="toc-desc">Mais um app no mesmo Yellow</span><span class="toc-page">P. 6</span></div>
+    <div class="toc-row"><span class="toc-num">06</span><span class="toc-title">Cheat Sheet</span><span class="toc-desc">Comandos essenciais em uma página</span><span class="toc-page">P. 7</span></div>
+  </div>
+
+  <div class="footer">
+    <span><strong>Davi Mendes</strong> · MisterGaltran · GitHub</span>
+    <span>v1.0 · Maio 2026 · Fortaleza, BR</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 1 — DEPLOY ============ -->
+<div class="page">
+  <h2><span class="num">01</span>Atualizar o app</h2>
+  <p class="subtitle">A regra: push pra <code>main</code> no GitHub. Frontend rebuilda sozinho. Backend você dispara manualmente.</p>
+
+  <h3>Fluxo do FRONTEND</h3>
+  <p>Mexeu em qualquer arquivo dentro de <code>frontend/</code>? Só precisa:</p>
+  <pre># no PowerShell do notebook
+cd C:\financaonboard
+git add frontend/
+git commit -m "ajuste no header"
+git push</pre>
+  <div class="card success">
+    O Cloudflare Pages tem webhook no GitHub. Detecta o push em ~10s, faz <code>npm run build</code> em <code>frontend/</code>, sobe pra CDN. Total: ~1-2 min. Acompanhe em <code>dash.cloudflare.com</code> → <strong>Workers &amp; Pages</strong> → <strong>financaonboard</strong> → <strong>Deployments</strong>.
+  </div>
+
+  <h3>Fluxo do BACKEND</h3>
+  <p>Mexeu em algo dentro de <code>backend/</code>? Após push, conecta no Yellow e roda o script de deploy:</p>
+  <pre># no SSH do Yellow
+bash /mnt/projects/financaonboard/infra/deploy.sh</pre>
+
+  <p>O que esse script faz, em ordem:</p>
+  <ol>
+    <li><code>git pull --ff-only</code> — atualiza o repo local com o <code>main</code> remoto.</li>
+    <li><code>npm ci --omit=dev</code> — instala deps de produção exatas (lockfile).</li>
+    <li><code>sudo systemctl restart financaonboard-api</code> — reinicia o serviço.</li>
+    <li>Espera 3s e mostra status + últimas 20 linhas do log.</li>
+  </ol>
+
+  <h3>Mudou variável de ambiente do backend?</h3>
+  <p>Edita o <code>.env</code> direto e reinicia:</p>
+  <pre>sudo nano /mnt/projects/financaonboard/backend/.env
+sudo systemctl restart financaonboard-api</pre>
+
+  <h3>Mudou variável do frontend (VITE_*)?</h3>
+  <p>No painel do Cloudflare Pages: <strong>Settings → Variables and Secrets → Production</strong>. Salva e clica em <strong>Retry deployment</strong> no último deploy. Vite injeta envs em build-time, então o rebuild é necessário.</p>
+
+  <h3>Adicionou nova API key no .env</h3>
+  <ol>
+    <li>No notebook, edita o <code>backend/.env</code> local pra desenvolvimento.</li>
+    <li>Faz <code>scp backend/.env yellow-vpn:/mnt/projects/financaonboard/backend/.env</code>.</li>
+    <li>No Yellow: <code>chmod 600 /mnt/projects/financaonboard/backend/.env</code>.</li>
+    <li><code>sudo systemctl restart financaonboard-api</code>.</li>
+  </ol>
+
+  <div class="card warning">
+    <strong>Cuidado com o .env:</strong> nunca commite no Git. O <code>backend/.gitignore</code> já cobre, mas confirme com <code>git status</code> antes de qualquer <code>git add</code>.
+  </div>
+
+  <div class="footer">
+    <span>01 · Atualizar o app</span>
+    <span>2 / 7</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 2 — MONITOR ============ -->
+<div class="page">
+  <h2><span class="num">02</span>Monitorar e diagnosticar</h2>
+  <p class="subtitle">Comandos do dia-a-dia. Tudo do SSH do Yellow.</p>
+
+  <h3>Status rápido</h3>
+  <pre>systemctl is-active financaonboard-api caddy
+# saída esperada: active / active</pre>
+
+  <h3>Logs ao vivo do backend</h3>
+  <pre>journalctl -u financaonboard-api -f</pre>
+  <p>Eventos esperados em condições normais:</p>
+  <ul>
+    <li><code>HTTP + Socket.io listening on :4000</code> ao subir</li>
+    <li><code>RSS &lt;Feed&gt;: N new</code> a cada 90s</li>
+    <li><code>Currency quotes refreshed: 5 pairs</code> a cada 15s</li>
+    <li><code>BR quotes refreshed (Yahoo): N symbols</code> a cada 15s</li>
+    <li><code>WARN Polygon WS closed (1006)</code> ocasional — reconecta automaticamente</li>
+  </ul>
+
+  <h3>Logs do Caddy</h3>
+  <pre>journalctl -u caddy -f</pre>
+  <p>Em condições normais é silencioso. Logs de TLS aparecem ~60 dias antes do vencimento (renovação automática).</p>
+
+  <h3>Health check externo</h3>
+  <pre>curl https://davi-mendes.dedyn.io/health
+# {"ok":true,"uptime":...,"providers":{"finnhub":true,"eodhd":true,"polygon":true,"brapi":true}}</pre>
+  <p>Se algum provider vier <code>false</code>: a chave dele está faltando ou inválida no <code>.env</code>.</p>
+
+  <h3>Saúde da máquina</h3>
+  <pre>uptime              # carga e tempo ligado
+free -h             # memória
+df -h /mnt/projects # disco
+htop                # interativo
+sudo nvme smart-log /dev/nvme0n1 | head -10  # saúde do SSD
+vcgencmd measure_temp 2>/dev/null            # temperatura</pre>
+
+  <h3>Tráfego do app</h3>
+  <pre># conexões ativas no Caddy (porta 443)
+sudo ss -tan state established 'sport = :443' | head -20
+
+# conexões ativas no backend (porta 4000, deve vir só de localhost)
+sudo ss -tan state established 'sport = :4000' | head -20</pre>
+
+  <h3>Erro recente?</h3>
+  <pre># últimos 50 erros do journal
+sudo journalctl -p err -n 50 --no-pager
+
+# todas as units do systemd que falharam
+systemctl --failed</pre>
+
+  <div class="card tip">
+    <strong>Dica:</strong> se quiser saber se alguém reiniciou o serviço, <code>journalctl -u financaonboard-api --no-pager | grep "Started"</code> mostra todas as inicializações com timestamp.
+  </div>
+
+  <div class="footer">
+    <span>02 · Monitorar e diagnosticar</span>
+    <span>3 / 7</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 3 — STORAGE ============ -->
+<div class="page">
+  <h2><span class="num">03</span>Onde tudo está armazenado</h2>
+  <p class="subtitle">Mapa rápido de arquivos críticos. Útil pra backup, troubleshooting e migração futura.</p>
+
+  <h3>No Yellow</h3>
+  <table>
+    <thead>
+      <tr><th>Caminho</th><th>O que é</th><th>Permissão</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>/mnt/projects/financaonboard/</code></td><td>Repo Git (clonado do GitHub)</td><td>davi:davi 755</td></tr>
+      <tr><td><code>/mnt/projects/financaonboard/backend/.env</code></td><td>API keys (Finnhub, EODHD, Polygon, BRAPI)</td><td>davi:davi 600</td></tr>
+      <tr><td><code>/etc/systemd/system/financaonboard-api.service</code></td><td>Unit do backend</td><td>root:root 644</td></tr>
+      <tr><td><code>/etc/caddy/Caddyfile</code></td><td>Config do reverse proxy</td><td>root:caddy 644</td></tr>
+      <tr><td><code>/etc/caddy/desec.env</code></td><td>Token API do deSEC (pra DNS-01)</td><td>root:caddy 640</td></tr>
+      <tr><td><code>/etc/systemd/system/caddy.service.d/override.conf</code></td><td>Override do Caddy (env file + sem --environ)</td><td>root:root 644</td></tr>
+      <tr><td><code>/var/lib/caddy/.local/share/caddy/</code></td><td>Certificados TLS armazenados</td><td>caddy:caddy</td></tr>
+      <tr><td><code>/usr/bin/caddy</code></td><td>Binário Caddy 2.11.2 (custom build com plugin desec)</td><td>root:root 755</td></tr>
+      <tr><td><code>/home/davi/desec/update.sh</code></td><td>Script DDNS (cron a cada 5 min)</td><td>davi:davi 755</td></tr>
+      <tr><td><code>/mnt/projects/backups/</code></td><td>Tarballs diários (retenção 7 dias)</td><td>davi:davi 755</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Fora do Yellow</h3>
+  <table>
+    <thead>
+      <tr><th>Lugar</th><th>O que tem</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>github.com/MisterGaltran/financaonboard</td><td>Código (frontend + backend + infra)</td></tr>
+      <tr><td>dash.cloudflare.com → Pages → financaonboard</td><td>Frontend hospedado, env vars VITE_*, builds</td></tr>
+      <tr><td>desec.io/domains → davi-mendes.dedyn.io</td><td>DNS records (A, AAAA, CNAME)</td></tr>
+      <tr><td>desec.io/tokens</td><td>Tokens API (caddy-acme-yellow-v2)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>O que é insubstituível e exige backup externo</h3>
+  <div class="card danger">
+    <ul>
+      <li><strong><code>/mnt/projects/financaonboard/backend/.env</code></strong> — perdeu, perdeu as API keys (algumas dão pra regenerar, outras não).</li>
+      <li><strong>Token deSEC em <code>/etc/caddy/desec.env</code></strong> — perdeu, gera outro no painel.</li>
+      <li><strong>Chave SSH privada do Yellow para GitHub</strong> em <code>~/.ssh/id_ed25519</code> — perdeu, gera nova e atualiza no GitHub.</li>
+    </ul>
+    <p>Recomendação: copia esses três pra um gerenciador de senhas ou USB criptografado, fora do Yellow.</p>
+  </div>
+
+  <div class="footer">
+    <span>03 · Onde tudo está armazenado</span>
+    <span>4 / 7</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 4 — TROUBLE ============ -->
+<div class="page">
+  <h2><span class="num">04</span>Troubleshooting</h2>
+  <p class="subtitle">Problemas comuns e o que fazer.</p>
+
+  <h3>Site não carrega: financaonboard.pages.dev fora do ar</h3>
+  <p>É problema do Cloudflare (extremamente raro) ou do build do frontend.</p>
+  <pre># Status do Cloudflare
+https://www.cloudflarestatus.com/
+
+# Último deploy do Pages
+dash.cloudflare.com → Pages → financaonboard → Deployments</pre>
+  <p>Se um deploy quebrou: clica em <strong>View build log</strong> para ver o erro. Geralmente é erro de build no frontend (typo, dependência faltando).</p>
+
+  <h3>App carrega mas indicador de conexão fica vermelho</h3>
+  <p>Backend ou Caddy fora do ar. Diagnostica do Yellow:</p>
+  <pre>systemctl is-active financaonboard-api caddy
+# se algum vier "failed" ou "inactive":
+sudo systemctl restart financaonboard-api caddy
+journalctl -u financaonboard-api -n 50 --no-pager</pre>
+
+  <h3>Health check da raiz funciona mas WebSocket não conecta</h3>
+  <p>Quase sempre CORS. O backend só aceita origins de <code>FRONTEND_URL</code>:</p>
+  <pre>grep FRONTEND_URL /mnt/projects/financaonboard/backend/.env
+# tem que ser https://financaonboard.pages.dev
+# se mudou de domínio no Pages, atualize aqui e:
+sudo systemctl restart financaonboard-api</pre>
+
+  <h3>TLS expirou (cert vencido)</h3>
+  <p>Caddy renova automaticamente ~30 dias antes. Se algo der errado:</p>
+  <pre>sudo journalctl -u caddy --since "1 day ago" | grep -i "obtain\|error"
+# se o token deSEC venceu, gera outro e atualiza:
+sudo nano /etc/caddy/desec.env
+sudo systemctl restart caddy</pre>
+
+  <h3>Yellow caiu / queda de luz</h3>
+  <p>Tudo volta sozinho quando a luz retornar:</p>
+  <ul>
+    <li>systemd inicia <code>caddy</code>, <code>financaonboard-api</code>, <code>wg-quick@wg0</code>.</li>
+    <li>cron retoma DDNS e backups.</li>
+    <li>Backend é stateless — recupera estado das APIs externas em segundos.</li>
+  </ul>
+  <p>Se algo não subiu: <code>systemctl --failed</code> e vê o que falhou.</p>
+
+  <h3>IP da Oi mudou e o site não resolve</h3>
+  <p>O cron deveria ter atualizado em até 5 min. Forçar manual:</p>
+  <pre>bash /home/davi/desec/update.sh
+tail -3 /home/davi/desec/update.log
+# tem que aparecer "good" na resposta da deSEC API</pre>
+
+  <h3>Frontend mostra dados antigos</h3>
+  <p>Cache do navegador. <strong>Ctrl+Shift+R</strong> faz hard refresh.</p>
+
+  <h3>Quero rollback pra versão anterior do backend</h3>
+  <pre>cd /mnt/projects/financaonboard
+git log --oneline -5                    # ver commits recentes
+git checkout &lt;commit-hash-anterior&gt;
+cd backend && npm ci --omit=dev
+sudo systemctl restart financaonboard-api
+# quando estabilizar, voltar pra main:
+cd /mnt/projects/financaonboard && git checkout main</pre>
+
+  <h3>Quero rollback do frontend</h3>
+  <p>No painel do Cloudflare Pages → Deployments → escolhe um deploy antigo → <strong>Rollback to this deployment</strong>.</p>
+
+  <div class="footer">
+    <span>04 · Troubleshooting</span>
+    <span>5 / 7</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 5 — SECOND BACKEND ============ -->
+<div class="page">
+  <h2><span class="num">05</span>Adicionar um segundo backend público</h2>
+  <p class="subtitle">Caso queira no futuro hospedar outro app no mesmo Yellow, com HTTPS público.</p>
+
+  <h3>Visão geral do que muda</h3>
+  <table>
+    <thead><tr><th>Aspecto</th><th>O que fazer</th></tr></thead>
+    <tbody>
+      <tr><td>Pasta do projeto</td><td><code>/mnt/projects/&lt;novo-app&gt;/</code></td></tr>
+      <tr><td>Porta interna</td><td>3000-3099 (Node), 5000-5099 (Python). Confirme com <code>sudo ss -tulpn | grep LISTEN</code></td></tr>
+      <tr><td>systemd unit</td><td><code>/etc/systemd/system/&lt;novo-app&gt;.service</code></td></tr>
+      <tr><td>Subdomínio</td><td>CNAME no deSEC apontando para <code>davi-mendes.dedyn.io.</code></td></tr>
+      <tr><td>Caddyfile</td><td>Adiciona um bloco novo, reload Caddy</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Passo a passo</h3>
+
+  <p><strong>1. Reservar a porta e clonar o projeto</strong></p>
+  <pre>cd /mnt/projects
+git clone &lt;url-do-repo&gt; &lt;novo-app&gt;
+cd &lt;novo-app&gt;
+# instalar deps...</pre>
+
+  <p><strong>2. Criar o <code>.env</code> e systemd unit</strong></p>
+  <p>Modelo de unit (substitua <code>&lt;novo-app&gt;</code> e a porta):</p>
+  <pre>[Unit]
+Description=&lt;novo-app&gt; API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=davi
+Group=davi
+WorkingDirectory=/mnt/projects/&lt;novo-app&gt;
+EnvironmentFile=/mnt/projects/&lt;novo-app&gt;/.env
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=5
+MemoryMax=512M
+CPUQuota=200%
+
+[Install]
+WantedBy=multi-user.target</pre>
+
+  <pre>sudo systemctl daemon-reload
+sudo systemctl enable --now &lt;novo-app&gt;.service</pre>
+
+  <p><strong>3. Criar subdomínio no deSEC</strong></p>
+  <p>Painel deSEC → davi-mendes.dedyn.io → Add CNAME:</p>
+  <ul>
+    <li>Subname: <code>app2</code></li>
+    <li>Target: <code>davi-mendes.dedyn.io.</code> (com ponto)</li>
+    <li>TTL: 3600</li>
+  </ul>
+
+  <p><strong>4. Adicionar bloco no Caddyfile</strong></p>
+  <pre>sudo nano /etc/caddy/Caddyfile</pre>
+  <p>Adiciona no final:</p>
+  <pre>app2.davi-mendes.dedyn.io {
+    encode zstd gzip
+    tls {
+        dns desec {
+            token {$DESEC_TOKEN}
+        }
+    }
+    reverse_proxy localhost:3001
+}</pre>
+
+  <p><strong>5. Reload do Caddy</strong></p>
+  <pre>sudo systemctl reload caddy
+sleep 30
+curl -I https://app2.davi-mendes.dedyn.io/</pre>
+  <p>Caddy emite o certificado automaticamente no primeiro acesso (~30s).</p>
+
+  <div class="card warning">
+    <strong>Atenção ao orçamento de RAM:</strong> Yellow tem 4GB total. Cada app novo come 256-512 MB. Já tem ~1.8 GB usados (sistema + financaonboard). Acima de 3 apps simultâneos, considera rodar Postgres compartilhado em vez de SQLite por app.
+  </div>
+
+  <div class="footer">
+    <span>05 · Adicionar segundo backend</span>
+    <span>6 / 7</span>
+  </div>
+</div>
+
+<!-- ============ PAGE 6 — CHEAT SHEET ============ -->
+<div class="page">
+  <h2><span class="num">06</span>Cheat Sheet</h2>
+  <p class="subtitle">Página única. Imprima e cole na mesa.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <span class="badge green">DEPLOY</span>
+      <h3>Frontend</h3>
+      <pre>git push origin main
+# Cloudflare rebuilda em ~1-2 min</pre>
+    </div>
+    <div class="card">
+      <span class="badge green">DEPLOY</span>
+      <h3>Backend</h3>
+      <pre># no SSH do Yellow
+bash /mnt/projects/financaonboard/infra/deploy.sh</pre>
+    </div>
+    <div class="card">
+      <span class="badge blue">MONITOR</span>
+      <h3>Status</h3>
+      <pre>systemctl is-active financaonboard-api caddy</pre>
+    </div>
+    <div class="card">
+      <span class="badge blue">MONITOR</span>
+      <h3>Logs ao vivo</h3>
+      <pre>journalctl -u financaonboard-api -f
+journalctl -u caddy -f</pre>
+    </div>
+    <div class="card">
+      <span class="badge blue">MONITOR</span>
+      <h3>Health check público</h3>
+      <pre>curl https://davi-mendes.dedyn.io/health</pre>
+    </div>
+    <div class="card">
+      <span class="badge blue">MONITOR</span>
+      <h3>Saúde da máquina</h3>
+      <pre>free -h && df -h /mnt/projects
+sudo journalctl -p err -n 50</pre>
+    </div>
+    <div class="card">
+      <span class="badge red">FIX</span>
+      <h3>Restart geral</h3>
+      <pre>sudo systemctl restart financaonboard-api caddy</pre>
+    </div>
+    <div class="card">
+      <span class="badge red">FIX</span>
+      <h3>Forçar atualização DDNS</h3>
+      <pre>bash /home/davi/desec/update.sh
+tail -3 /home/davi/desec/update.log</pre>
+    </div>
+  </div>
+
+  <h3>Referência rápida</h3>
+  <table>
+    <tbody>
+      <tr><td><strong>URL frontend</strong></td><td><code>https://financaonboard.pages.dev</code></td></tr>
+      <tr><td><strong>URL backend</strong></td><td><code>https://davi-mendes.dedyn.io</code></td></tr>
+      <tr><td><strong>SSH Yellow (em casa)</strong></td><td><code>ssh davi@yellow-vpn.local</code></td></tr>
+      <tr><td><strong>SSH Yellow (fora, com VPN)</strong></td><td><code>ssh davi@192.168.1.50</code></td></tr>
+      <tr><td><strong>Pasta do app</strong></td><td><code>/mnt/projects/financaonboard/</code></td></tr>
+      <tr><td><strong>.env do backend</strong></td><td><code>/mnt/projects/financaonboard/backend/.env</code></td></tr>
+      <tr><td><strong>Caddyfile</strong></td><td><code>/etc/caddy/Caddyfile</code></td></tr>
+      <tr><td><strong>Token deSEC</strong></td><td><code>/etc/caddy/desec.env</code></td></tr>
+      <tr><td><strong>Painel Cloudflare</strong></td><td><code>dash.cloudflare.com</code> → Workers &amp; Pages → financaonboard</td></tr>
+      <tr><td><strong>Painel deSEC</strong></td><td><code>desec.io/domains/davi-mendes.dedyn.io</code></td></tr>
+      <tr><td><strong>Painel Nokia</strong></td><td><code>http://192.168.1.1</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Workflow completo de uma sessão</h3>
+  <ol>
+    <li>Conectar: <code>ssh davi@yellow-vpn.local</code> (em casa) ou via VPN+SSH.</li>
+    <li>Atualizar: <code>cd /mnt/projects/financaonboard &amp;&amp; git pull</code></li>
+    <li>Editar (preferência): VS Code Remote-SSH no Yellow.</li>
+    <li>Testar localmente: <code>cd backend &amp;&amp; npm run dev</code> (se quiser modo dev separado).</li>
+    <li>Commitar: <code>git add . &amp;&amp; git commit -m "msg" &amp;&amp; git push</code></li>
+    <li>Deploy backend: <code>bash infra/deploy.sh</code></li>
+    <li>Validar: <code>curl https://davi-mendes.dedyn.io/health</code></li>
+  </ol>
+
+  <div class="footer">
+    <span>06 · Cheat Sheet</span>
+    <span>7 / 7</span>
+  </div>
+</div>
+
+</body>
+</html>
