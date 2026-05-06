@@ -1,0 +1,21 @@
+[Unit]
+Description=Financas OnBoard API (Express + Socket.io)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=davi
+Group=davi
+WorkingDirectory=/mnt/projects/financaonboard/backend
+EnvironmentFile=/mnt/projects/financaonboard/backend/.env
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+MemoryMax=512M
+CPUQuota=200%
+
+[Install]
+WantedBy=multi-user.target
