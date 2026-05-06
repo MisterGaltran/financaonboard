@@ -16,7 +16,7 @@ export default function Dashboard({ onOpenPalette }) {
           <div className="flex items-center gap-2.5">
             <div className="w-2.5 h-2.5 rounded-full bg-accent" />
             <span className="text-text-primary text-ui-sm font-semibold tracking-[0.15em]">
-              FINANCA ONBOARD
+              FINANÇAS ONBOARD
             </span>
           </div>
 

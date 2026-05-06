@@ -9,6 +9,7 @@ const { startPolygonBridge } = require('./src/websocket/polygonBridge');
 const { startCalendarCron } = require('./src/services/calendarCron');
 const { startBrRssPoller } = require('./src/services/brRssPoller');
 const { startBrQuotesCron } = require('./src/services/brQuotesCron');
+const { startCurrencyCron } = require('./src/services/currencyCron');
 
 const httpServer = http.createServer();
 
@@ -38,6 +39,7 @@ startPolygonBridge(io);
 startCalendarCron(io);
 startBrRssPoller(io);
 startBrQuotesCron(io);
+startCurrencyCron(io);
 
 httpServer.listen(env.PORT, () => {
   logger.info(`HTTP + Socket.io listening on :${env.PORT}`);

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-const DEFAULT_SYMBOLS = ['PETR4', 'VALE3', 'ITUB4', 'BBAS3', 'ABEV3'];
+const DEFAULT_SYMBOLS = ['PETR4', 'VALE3', 'ITUB4', 'USDBRL', 'BTCBRL'];
 
 export const useWatchlistStore = create(
   persist(

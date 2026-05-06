@@ -1,6 +1,30 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { useWatchlistStore } from '../../store/watchlistStore';
 import { useBrQuotesStore } from '../../store/brQuotesStore';
+import { useCurrencyStore } from '../../store/currencyStore';
+
+const CURRENCY_CATALOG = [
+  { symbol: 'USDBRL', name: 'Dólar Americano', assetType: 'currency' },
+  { symbol: 'EURBRL', name: 'Euro', assetType: 'currency' },
+  { symbol: 'GBPBRL', name: 'Libra Esterlina', assetType: 'currency' },
+  { symbol: 'JPYBRL', name: 'Iene Japonês', assetType: 'currency' },
+  { symbol: 'CNYBRL', name: 'Yuan Chinês', assetType: 'currency' },
+  { symbol: 'ARSBRL', name: 'Peso Argentino', assetType: 'currency' },
+  { symbol: 'CHFBRL', name: 'Franco Suíço', assetType: 'currency' },
+  { symbol: 'CADBRL', name: 'Dólar Canadense', assetType: 'currency' },
+  { symbol: 'AUDBRL', name: 'Dólar Australiano', assetType: 'currency' },
+  { symbol: 'BTCBRL', name: 'Bitcoin', assetType: 'crypto' },
+  { symbol: 'ETHBRL', name: 'Ethereum', assetType: 'crypto' },
+  { symbol: 'XRPBRL', name: 'Ripple (XRP)', assetType: 'crypto' },
+  { symbol: 'DOGEBRL', name: 'Dogecoin', assetType: 'crypto' },
+  { symbol: 'LTCBRL', name: 'Litecoin', assetType: 'crypto' },
+  { symbol: 'SOLBRL', name: 'Solana', assetType: 'crypto' },
+];
+
+const TABS = [
+  { key: 'stocks', label: 'AÇÕES' },
+  { key: 'currency', label: 'CÂMBIO & CRYPTO' },
+];
 
 export default function WatchlistEditor({ onClose }) {
   const symbols = useWatchlistStore((s) => s.symbols);
@@ -9,48 +33,87 @@ export default function WatchlistEditor({ onClose }) {
   const clear = useWatchlistStore((s) => s.clear);
   const reset = useWatchlistStore((s) => s.reset);
   const ibov = useBrQuotesStore((s) => s.quotes);
+  const currencyQuotes = useCurrencyStore((s) => s.quotes);
 
+  const [tab, setTab] = useState('stocks');
   const [query, setQuery] = useState('');
   const inputRef = useRef(null);
   useEffect(() => { inputRef.current?.focus(); }, []);
+  useEffect(() => { setQuery(''); }, [tab]);
+
+  const currencyMap = useMemo(() => {
+    const m = new Map();
+    for (const q of currencyQuotes) m.set(q.symbol, q);
+    return m;
+  }, [currencyQuotes]);
 
   const suggestions = useMemo(() => {
     const q = query.trim().toUpperCase();
-    if (!q) return ibov.slice(0, 12);
-    return ibov
-      .filter((s) => s.symbol.includes(q) || (s.name || '').toUpperCase().includes(q))
-      .slice(0, 20);
-  }, [ibov, query]);
+    if (tab === 'stocks') {
+      if (!q) return ibov.slice(0, 12);
+      return ibov
+        .filter((s) => s.symbol.includes(q) || (s.name || '').toUpperCase().includes(q))
+        .slice(0, 20);
+    }
+    // currency & crypto tab
+    const items = CURRENCY_CATALOG.map((c) => {
+      const live = currencyMap.get(c.symbol);
+      return { ...c, price: live?.price ?? null, changePct: live?.changePct ?? null };
+    });
+    if (!q) return items;
+    return items.filter((c) =>
+      c.symbol.includes(q) || c.name.toUpperCase().includes(q) || c.assetType.toUpperCase().includes(q)
+    );
+  }, [ibov, currencyQuotes, currencyMap, query, tab]);
+
+  const handleAdd = (symbol) => {
+    add(symbol);
+    setQuery('');
+  };
 
   return (
     <div className="fixed inset-0 z-[8000] flex items-start justify-center pt-20 bg-black/80 backdrop-blur-sm" onClick={onClose}>
       <div className="w-full max-w-2xl bg-surface-alt border-2 border-accent rounded shadow-[0_0_40px_rgba(99,102,241,0.2)]" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-4 py-2.5 bg-surface border-b border-border rounded-t">
-          <span className="text-ui-sm font-semibold tracking-widest text-text-primary">EDIT WATCHLIST</span>
-          <button onClick={onClose} className="text-ui-xs text-text-secondary hover:text-negative tracking-widest">CLOSE · ESC</button>
+          <span className="text-ui-sm font-semibold tracking-widest text-text-primary">EDITAR WATCHLIST</span>
+          <button onClick={onClose} className="text-ui-xs text-text-secondary hover:text-negative tracking-widest">FECHAR · ESC</button>
         </div>
 
         <div className="p-4 space-y-4">
-          <div>
-            <input
-              ref={inputRef}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && suggestions[0]) {
-                  add(suggestions[0].symbol);
-                  setQuery('');
-                }
-                if (e.key === 'Escape') onClose();
-              }}
-              placeholder="Buscar PETR4, Vale, banco..."
-              className="w-full px-3 py-2 bg-surface border border-border focus:border-accent rounded outline-none text-text-primary placeholder-text-secondary tabular-nums tracking-wider text-ui-sm"
-            />
+          {/* Tabs */}
+          <div className="flex gap-1">
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`px-3 py-1.5 text-ui-xs tracking-widest rounded border ${tab === t.key ? 'bg-accent/20 border-accent text-accent-light' : 'bg-surface border-border text-text-secondary hover:border-accent'}`}
+              >
+                {t.label}
+              </button>
+            ))}
           </div>
 
+          {/* Search */}
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && suggestions[0]) {
+                handleAdd(suggestions[0].symbol);
+              }
+              if (e.key === 'Escape') onClose();
+            }}
+            placeholder={tab === 'stocks' ? 'Buscar PETR4, Vale, banco...' : 'Buscar USD, Bitcoin, EUR...'}
+            className="w-full px-3 py-2 bg-surface border border-border focus:border-accent rounded outline-none text-text-primary placeholder-text-secondary tabular-nums tracking-wider text-ui-sm"
+          />
+
+          {/* Results */}
           <div>
             <div className="text-ui-xs tracking-widest text-text-secondary mb-1.5">
-              {query.trim() ? `RESULTADOS (${suggestions.length})` : 'TOP-12 IBOV POR VOLUME'}
+              {query.trim()
+                ? `RESULTADOS (${suggestions.length})`
+                : tab === 'stocks' ? 'TOP-12 IBOV POR VOLUME' : 'MOEDAS & CRIPTOMOEDAS'}
             </div>
             <div className="max-h-48 overflow-y-auto border border-border rounded">
               {suggestions.length === 0 && (
@@ -58,10 +121,13 @@ export default function WatchlistEditor({ onClose }) {
               )}
               {suggestions.map((s) => {
                 const already = symbols.includes(s.symbol);
+                const isCrypto = s.assetType === 'crypto';
+                const isCurrency = s.assetType === 'currency';
+                const badge = isCrypto ? 'CRYPTO' : isCurrency ? 'FX' : null;
                 return (
                   <button
                     key={s.symbol}
-                    onClick={() => (already ? remove(s.symbol) : add(s.symbol))}
+                    onClick={() => (already ? remove(s.symbol) : handleAdd(s.symbol))}
                     className={`w-full flex items-center justify-between gap-3 px-3 py-2 border-b border-border/50 hover:bg-surface-hover text-ui-xs ${already ? 'bg-surface-hover' : ''}`}
                   >
                     <span className="flex items-center gap-2">
@@ -69,15 +135,23 @@ export default function WatchlistEditor({ onClose }) {
                         {already ? '✓' : '+'}
                       </span>
                       <span className="font-semibold tracking-wider text-text-primary">{s.symbol}</span>
-                      <span className="text-text-secondary truncate max-w-[200px]">{s.name}</span>
+                      <span className="text-text-secondary truncate max-w-[180px]">{s.name}</span>
+                      {badge && (
+                        <span className={`text-[9px] px-1.5 py-0.5 rounded tracking-wider ${isCrypto ? 'bg-warning/20 text-warning' : 'bg-info/20 text-info'}`}>
+                          {badge}
+                        </span>
+                      )}
                     </span>
-                    <span className="tabular-nums text-text-secondary">R$ {s.price?.toFixed(2)}</span>
+                    <span className="tabular-nums text-text-secondary">
+                      {s.price != null ? `R$ ${s.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: s.price > 1000 ? 0 : 4 })}` : '—'}
+                    </span>
                   </button>
                 );
               })}
             </div>
           </div>
 
+          {/* Current list */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-ui-xs tracking-widest text-text-secondary">SUA LISTA ({symbols.length})</span>

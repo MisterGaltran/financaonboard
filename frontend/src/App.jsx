@@ -3,9 +3,16 @@ import Dashboard from './components/Dashboard/Dashboard';
 import AlertPopup from './components/AlertSystem/AlertPopup';
 import CommandPalette from './components/CommandPalette/CommandPalette';
 import { useSocket } from './hooks/useSocket';
+import { useCurrencyStore } from './store/currencyStore';
+import { fetchCurrencyQuotes } from './services/apiClient';
 
 export default function App() {
   useSocket();
+  const setCurrencyQuotes = useCurrencyStore((s) => s.setQuotes);
+
+  useEffect(() => {
+    fetchCurrencyQuotes().then((q) => { if (q.length) setCurrencyQuotes(q); }).catch(() => {});
+  }, [setCurrencyQuotes]);
   const [paletteOpen, setPaletteOpen] = useState(false);
 
   useEffect(() => {

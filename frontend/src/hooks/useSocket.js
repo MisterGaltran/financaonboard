@@ -5,6 +5,7 @@ import { useCalendarStore } from '../store/calendarStore';
 import { useAlertStore } from '../store/alertStore';
 import { useConnectionStore } from '../store/connectionStore';
 import { useBrQuotesStore } from '../store/brQuotesStore';
+import { useCurrencyStore } from '../store/currencyStore';
 
 export function useSocket() {
   const addNews = useNewsStore((s) => s.addItem);
@@ -15,6 +16,7 @@ export function useSocket() {
   const resetAttempts = useConnectionStore((s) => s.resetAttempts);
   const setProviders = useConnectionStore((s) => s.setProviders);
   const setBrQuotes = useBrQuotesStore((s) => s.setQuotes);
+  const setCurrencyQuotes = useCurrencyStore((s) => s.setQuotes);
 
   useEffect(() => {
     if (!socket.connected) socket.connect();
@@ -30,6 +32,7 @@ export function useSocket() {
     const onAlertCritical = (alert) => enqueueAlert(alert);
     const onProviderStatus = (s) => setProviders(s);
     const onQuotesBr = (quotes) => setBrQuotes(quotes);
+    const onCurrencyUpdate = (quotes) => setCurrencyQuotes(quotes);
 
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
@@ -42,6 +45,7 @@ export function useSocket() {
     socket.on('alert:critical', onAlertCritical);
     socket.on('provider:status', onProviderStatus);
     socket.on('quotes:br:update', onQuotesBr);
+    socket.on('quotes:currency:update', onCurrencyUpdate);
 
     return () => {
       socket.off('connect', onConnect);
@@ -54,6 +58,7 @@ export function useSocket() {
       socket.off('alert:critical', onAlertCritical);
       socket.off('provider:status', onProviderStatus);
       socket.off('quotes:br:update', onQuotesBr);
+      socket.off('quotes:currency:update', onCurrencyUpdate);
     };
-  }, [addNews, setCalendar, enqueueAlert, setStatus, incAttempts, resetAttempts, setProviders, setBrQuotes]);
+  }, [addNews, setCalendar, enqueueAlert, setStatus, incAttempts, resetAttempts, setProviders, setBrQuotes, setCurrencyQuotes]);
 }
