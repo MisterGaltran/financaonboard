@@ -36,6 +36,8 @@ module.exports = {
     { name: 'NeoFeed',            url: 'https://neofeed.com.br/feed/' },
     { name: 'E-Investidor',       url: 'https://einvestidor.estadao.com.br/feed/' },
     { name: 'Valor Econômico',   url: 'https://pox.globo.com/rss/valor/' },
+    { name: 'Valor Finanças',    url: 'https://pox.globo.com/rss/valor/financas/' },
+    { name: 'Valor Empresas',    url: 'https://pox.globo.com/rss/valor/empresas/' },
     { name: 'Investing.com BR',  url: 'https://br.investing.com/rss/news.rss' },
     { name: 'Agência Brasil',    url: 'https://agenciabrasil.ebc.com.br/rss/economia/feed.xml' },
     { name: 'Banco Central',     url: 'https://www.bcb.gov.br/api/feed/sitebcb/sitefeeds/noticias' }
