@@ -54,7 +54,7 @@ export default function NewsFeed() {
           const isFresh = age >= 0 && age < 5 * 60_000;
           const isStale = age > 60 * 60_000;
           const highlight = isFresh ? 'border-l-2 border-l-accent' : 'border-l-2 border-l-transparent';
-          const dim = isStale ? 'opacity-40' : '';
+          const dim = isStale ? 'opacity-70' : '';
           return (
             <article key={n.id} className={`pl-3 pr-4 py-2 border-b border-border/40 row-hover ${highlight} ${dim} animate-fade-in`}>
               <div className="flex items-center gap-2 text-ui-xs text-text-secondary tracking-wider">

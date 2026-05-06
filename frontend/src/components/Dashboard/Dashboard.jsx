@@ -46,7 +46,7 @@ export default function Dashboard({ onOpenPalette }) {
       <Watchlist />
       <BrazilQuotes />
 
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-px bg-border overflow-hidden">
+      <main className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-px bg-border overflow-hidden">
         <EconomicCalendar />
         <NewsFeed />
       </main>

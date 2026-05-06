@@ -34,6 +34,10 @@ module.exports = {
     { name: 'Seu Dinheiro',       url: 'https://www.seudinheiro.com/feed/' },
     { name: 'Suno Notícias',      url: 'https://www.suno.com.br/noticias/feed/' },
     { name: 'NeoFeed',            url: 'https://neofeed.com.br/feed/' },
-    { name: 'E-Investidor',       url: 'https://einvestidor.estadao.com.br/feed/' }
+    { name: 'E-Investidor',       url: 'https://einvestidor.estadao.com.br/feed/' },
+    { name: 'Valor Econômico',   url: 'https://pox.globo.com/rss/valor/' },
+    { name: 'Investing.com BR',  url: 'https://br.investing.com/rss/news.rss' },
+    { name: 'Agência Brasil',    url: 'https://agenciabrasil.ebc.com.br/rss/economia/feed.xml' },
+    { name: 'Banco Central',     url: 'https://www.bcb.gov.br/api/feed/sitebcb/sitefeeds/noticias' }
   ]
 };

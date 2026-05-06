@@ -59,7 +59,7 @@ function Row({ e, now }) {
   const ts = parseEventTs(e.time);
   const isPast = !Number.isNaN(ts) && ts < now;
   const time = String(e.time).slice(11, 16) || String(e.time).slice(0, 10);
-  const rowDim = isPast ? 'opacity-40' : '';
+  const rowDim = isPast ? 'opacity-60' : '';
   return (
     <tr data-event-id={e.id} className={`border-b border-border/50 row-hover ${rowDim}`}>
       <td className="px-2 py-1.5 tabular-nums text-info">{time}</td>
