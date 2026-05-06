@@ -6,6 +6,7 @@ import { useAlertStore } from '../store/alertStore';
 import { useConnectionStore } from '../store/connectionStore';
 import { useBrQuotesStore } from '../store/brQuotesStore';
 import { useCurrencyStore } from '../store/currencyStore';
+import { useIndicesStore } from '../store/indicesStore';
 
 export function useSocket() {
   const addNews = useNewsStore((s) => s.addItem);
@@ -17,6 +18,7 @@ export function useSocket() {
   const setProviders = useConnectionStore((s) => s.setProviders);
   const setBrQuotes = useBrQuotesStore((s) => s.setQuotes);
   const setCurrencyQuotes = useCurrencyStore((s) => s.setQuotes);
+  const setIndices = useIndicesStore((s) => s.setIndices);
 
   useEffect(() => {
     if (!socket.connected) socket.connect();
@@ -33,6 +35,7 @@ export function useSocket() {
     const onProviderStatus = (s) => setProviders(s);
     const onQuotesBr = (quotes) => setBrQuotes(quotes);
     const onCurrencyUpdate = (quotes) => setCurrencyQuotes(quotes);
+    const onIndicesUpdate = (data) => setIndices(data);
 
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
@@ -46,6 +49,7 @@ export function useSocket() {
     socket.on('provider:status', onProviderStatus);
     socket.on('quotes:br:update', onQuotesBr);
     socket.on('quotes:currency:update', onCurrencyUpdate);
+    socket.on('indices:update', onIndicesUpdate);
 
     return () => {
       socket.off('connect', onConnect);
@@ -59,6 +63,7 @@ export function useSocket() {
       socket.off('provider:status', onProviderStatus);
       socket.off('quotes:br:update', onQuotesBr);
       socket.off('quotes:currency:update', onCurrencyUpdate);
+      socket.off('indices:update', onIndicesUpdate);
     };
-  }, [addNews, setCalendar, enqueueAlert, setStatus, incAttempts, resetAttempts, setProviders, setBrQuotes, setCurrencyQuotes]);
+  }, [addNews, setCalendar, enqueueAlert, setStatus, incAttempts, resetAttempts, setProviders, setBrQuotes, setCurrencyQuotes, setIndices]);
 }

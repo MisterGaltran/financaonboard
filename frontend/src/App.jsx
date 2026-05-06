@@ -4,15 +4,18 @@ import AlertPopup from './components/AlertSystem/AlertPopup';
 import CommandPalette from './components/CommandPalette/CommandPalette';
 import { useSocket } from './hooks/useSocket';
 import { useCurrencyStore } from './store/currencyStore';
-import { fetchCurrencyQuotes } from './services/apiClient';
+import { useIndicesStore } from './store/indicesStore';
+import { fetchCurrencyQuotes, fetchIndices } from './services/apiClient';
 
 export default function App() {
   useSocket();
   const setCurrencyQuotes = useCurrencyStore((s) => s.setQuotes);
+  const setIndices = useIndicesStore((s) => s.setIndices);
 
   useEffect(() => {
     fetchCurrencyQuotes().then((q) => { if (q.length) setCurrencyQuotes(q); }).catch(() => {});
-  }, [setCurrencyQuotes]);
+    fetchIndices().then((data) => { if (data) setIndices(data); }).catch(() => {});
+  }, [setCurrencyQuotes, setIndices]);
   const [paletteOpen, setPaletteOpen] = useState(false);
 
   useEffect(() => {

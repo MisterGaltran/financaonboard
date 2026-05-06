@@ -23,6 +23,11 @@ export async function fetchBrQuotes(tickers) {
   return data.quotes || [];
 }
 
+export async function fetchIndices() {
+  const { data } = await apiClient.get('/api/indices');
+  return data;
+}
+
 export async function fetchCurrencyQuotes() {
   const { data } = await apiClient.get('/api/quotes/currency');
   return data.quotes || [];

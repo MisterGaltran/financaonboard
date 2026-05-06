@@ -7,6 +7,7 @@ const calendarRoutes = require('./routes/calendar');
 const newsRoutes = require('./routes/news');
 const brQuotesRoutes = require('./routes/brQuotes');
 const currencyRoutes = require('./routes/currency');
+const { getLatestIndices } = require('./services/indicesCron');
 const { makeDebugRouter } = require('./routes/debug');
 const { env } = require('./config/env');
 
@@ -34,6 +35,7 @@ function createApp({ io }) {
   app.use('/api/news', apiLimiter, newsRoutes);
   app.use('/api/quotes/br', apiLimiter, brQuotesRoutes);
   app.use('/api/quotes/currency', apiLimiter, currencyRoutes);
+  app.get('/api/indices', apiLimiter, (req, res) => res.json(getLatestIndices()));
   app.use('/api/debug', strictLimiter, makeDebugRouter(io));
 
   app.use(notFound);

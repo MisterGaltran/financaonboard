@@ -10,6 +10,7 @@ const { startCalendarCron } = require('./src/services/calendarCron');
 const { startBrRssPoller } = require('./src/services/brRssPoller');
 const { startBrQuotesCron } = require('./src/services/brQuotesCron');
 const { startCurrencyCron } = require('./src/services/currencyCron');
+const { startIndicesCron } = require('./src/services/indicesCron');
 
 const httpServer = http.createServer();
 
@@ -40,6 +41,7 @@ startCalendarCron(io);
 startBrRssPoller(io);
 startBrQuotesCron(io);
 startCurrencyCron(io);
+startIndicesCron(io);
 
 httpServer.listen(env.PORT, () => {
   logger.info(`HTTP + Socket.io listening on :${env.PORT}`);
