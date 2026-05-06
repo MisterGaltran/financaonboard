@@ -25,45 +25,45 @@ export default function AlertPopup() {
   if (!current) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm font-mono">
-      <div className="relative w-full max-w-3xl mx-4 border-2 border-bbg-red bg-black animate-border-pulse">
-        <div className="flex items-center justify-between px-4 py-2 border-b-2 border-bbg-red bg-bbg-red/10">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm font-sans">
+      <div className="relative w-full max-w-3xl mx-4 border-2 border-negative bg-surface-alt rounded animate-border-pulse">
+        <div className="flex items-center justify-between px-5 py-3 border-b-2 border-negative bg-negative/10 rounded-t">
           <div className="flex items-center gap-3">
-            <span className="text-bbg-red text-2xl font-black animate-pulse">⚠</span>
+            <span className="text-negative text-2xl font-black animate-pulse">!</span>
             <div className="leading-tight">
-              <div className="text-[10px] uppercase tracking-[0.3em] text-bbg-red font-bold">HIGH IMPACT ALERT</div>
-              <div className="text-bbg-xs text-bbg-amber-dim tabular-nums tracking-wider">{fmtDateTime(current.timestamp)}</div>
+              <div className="text-ui-xs uppercase tracking-[0.3em] text-negative font-bold">HIGH IMPACT ALERT</div>
+              <div className="text-ui-xs text-text-secondary tabular-nums tracking-wider">{fmtDateTime(current.timestamp)}</div>
             </div>
           </div>
           {count > 1 && (
-            <div className="text-bbg-xs text-bbg-yellow tracking-widest">+{count - 1} QUEUED</div>
+            <div className="text-ui-xs text-warning tracking-widest">+{count - 1} NA FILA</div>
           )}
         </div>
 
-        <div className="px-4 py-3 border-b border-bbg-border">
-          <h3 className="text-bbg-md font-bold leading-snug mb-2 text-bbg-white">{current.title}</h3>
+        <div className="px-5 py-4 border-b border-border">
+          <h3 className="text-[15px] font-bold leading-snug mb-2 text-text-primary">{current.title}</h3>
           {current.message && (
-            <p className="text-bbg-sm text-bbg-amber leading-relaxed">{current.message}</p>
+            <p className="text-ui-base text-text-secondary leading-relaxed">{current.message}</p>
           )}
           {current.tickers?.length ? (
-            <div className="mt-3 flex flex-wrap gap-1">
+            <div className="mt-3 flex flex-wrap gap-1.5">
               {current.tickers.map((t) => (
-                <span key={t} className="text-bbg-xs px-1.5 py-0.5 bg-bbg-red/20 text-bbg-red border border-bbg-red font-bold tracking-wider">{t}</span>
+                <span key={t} className="text-ui-xs px-2 py-0.5 rounded bg-negative/20 text-negative border border-negative font-semibold tracking-wider">{t}</span>
               ))}
             </div>
           ) : null}
           {current.source && (
-            <div className="mt-3 text-[10px] uppercase text-bbg-muted tracking-widest">SRC · {current.source}</div>
+            <div className="mt-3 text-ui-xs uppercase text-text-secondary tracking-widest">FONTE · {current.source}</div>
           )}
         </div>
 
-        <div className="flex items-center gap-2 px-4 py-2 bg-bbg-panel">
+        <div className="flex items-center gap-2 px-5 py-3 bg-surface rounded-b">
           {!soundEnabled && (
             <button
               onClick={enableSound}
-              className="px-2 py-1 text-[10px] bg-bbg-yellow/20 text-bbg-yellow border border-bbg-yellow hover:bg-bbg-yellow/30 tracking-widest"
+              className="px-3 py-1.5 text-ui-xs rounded bg-warning/20 text-warning border border-warning hover:bg-warning/30 tracking-widest"
             >
-              ♪ ENABLE SOUND
+              ATIVAR SOM
             </button>
           )}
           {current.url && (
@@ -71,23 +71,23 @@ export default function AlertPopup() {
               href={current.url}
               target="_blank"
               rel="noreferrer"
-              className="px-2 py-1 text-[10px] text-bbg-amber border border-bbg-border hover:border-bbg-amber tracking-widest"
+              className="px-3 py-1.5 text-ui-xs rounded text-text-primary border border-border hover:border-accent tracking-widest"
             >
-              SOURCE ↗
+              FONTE ↗
             </a>
           )}
           <div className="ml-auto flex gap-2">
             {count > 1 && (
               <button
                 onClick={clearAll}
-                className="px-2 py-1 text-[10px] text-bbg-muted border border-bbg-border hover:border-bbg-red hover:text-bbg-red tracking-widest"
+                className="px-3 py-1.5 text-ui-xs rounded text-text-secondary border border-border hover:border-negative hover:text-negative tracking-widest"
               >
-                CLEAR·ALL
+                LIMPAR TUDO
               </button>
             )}
             <button
               onClick={() => acknowledge(current.id)}
-              className="px-4 py-1 text-[10px] font-bold bg-bbg-red text-black hover:bg-bbg-amber tracking-widest"
+              className="px-4 py-1.5 text-ui-xs font-bold rounded bg-negative text-white hover:bg-negative/80 tracking-widest"
             >
               ACK · ENTER
             </button>
