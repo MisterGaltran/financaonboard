@@ -21,9 +21,9 @@ export const fmtHHMM = (ts) => {
 
 export const impactClass = (impact) => {
   switch ((impact || '').toLowerCase()) {
-    case 'high':   return 'bg-bbg-red text-black';
-    case 'medium': return 'bg-bbg-yellow text-black';
-    default:       return 'bg-bbg-muted/40 text-bbg-amber';
+    case 'high':   return 'bg-negative text-white';
+    case 'medium': return 'bg-warning text-black';
+    default:       return 'bg-text-secondary/30 text-text-primary';
   }
 };
 
@@ -35,7 +35,7 @@ export const impactLabel = (impact) => {
   }
 };
 
-export const IMPACT_BADGE_CLASS = 'inline-flex items-center justify-center w-5 h-5 text-[11px] font-black leading-none tabular-nums';
+export const IMPACT_BADGE_CLASS = 'inline-flex items-center justify-center w-5 h-5 rounded text-[11px] font-bold leading-none tabular-nums';
 
 export const fmtNum = (v, digits = 2) => {
   if (v == null) return '—';

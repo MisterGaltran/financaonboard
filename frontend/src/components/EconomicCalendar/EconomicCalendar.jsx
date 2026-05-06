@@ -10,7 +10,7 @@ import CountryFilter from './CountryFilter';
 function ActualCell({ value }) {
   const flash = useFlash(typeof value === 'number' ? value : parseFloat(value));
   return (
-    <td className={`px-2 py-1 text-right tabular-nums text-bbg-white ${flash}`}>
+    <td className={`px-2 py-1.5 text-right tabular-nums text-text-primary ${flash}`}>
       {value ?? '—'}
     </td>
   );
@@ -35,7 +35,7 @@ function dayLabel(ts, now) {
   const weekday = d.toLocaleDateString('pt-BR', { weekday: 'short' }).toUpperCase().replace('.', '');
   const dm = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
   if (diffDays === 0) return `HOJE · ${weekday} ${dm}`;
-  if (diffDays === 1) return `AMANHÃ · ${weekday} ${dm}`;
+  if (diffDays === 1) return `AMANHA · ${weekday} ${dm}`;
   if (diffDays === -1) return `ONTEM · ${weekday} ${dm}`;
   return `${weekday} · ${dm}`;
 }
@@ -59,16 +59,16 @@ function Row({ e, now }) {
   const ts = parseEventTs(e.time);
   const isPast = !Number.isNaN(ts) && ts < now;
   const time = String(e.time).slice(11, 16) || String(e.time).slice(0, 10);
-  const rowDim = isPast ? 'opacity-50' : '';
+  const rowDim = isPast ? 'opacity-40' : '';
   return (
-    <tr data-event-id={e.id} className={`border-b border-bbg-border/50 bbg-row-hover ${rowDim}`}>
-      <td className="px-2 py-1 tabular-nums text-bbg-cyan">{time}</td>
-      <td className="px-2 py-1 text-bbg-muted"><span className="mr-1">{flagFor(e.country)}</span>{e.country}</td>
-      <td className="px-2 py-1 text-bbg-amber">{e.event}</td>
+    <tr data-event-id={e.id} className={`border-b border-border/50 row-hover ${rowDim}`}>
+      <td className="px-2 py-1.5 tabular-nums text-info">{time}</td>
+      <td className="px-2 py-1.5 text-text-secondary"><span className="mr-1">{flagFor(e.country)}</span>{e.country}</td>
+      <td className="px-2 py-1.5 text-text-primary">{e.event}</td>
       <ActualCell value={e.actual} />
-      <td className="px-2 py-1 text-right tabular-nums text-bbg-muted">{e.estimate ?? '—'}</td>
-      <td className="px-2 py-1 text-right tabular-nums text-bbg-muted">{e.previous ?? '—'}</td>
-      <td className="px-2 py-1 text-center">
+      <td className="px-2 py-1.5 text-right tabular-nums text-text-secondary">{e.estimate ?? '—'}</td>
+      <td className="px-2 py-1.5 text-right tabular-nums text-text-secondary">{e.previous ?? '—'}</td>
+      <td className="px-2 py-1.5 text-center">
         <span className={`${IMPACT_BADGE_CLASS} ${impactClass(e.impact)}`}>
           {impactLabel(e.impact)}
         </span>
@@ -114,35 +114,35 @@ export default function EconomicCalendar() {
   const grouped = useMemo(() => groupByDay(sorted, now), [sorted, now]);
 
   return (
-    <div className="bg-bbg-panel h-full flex flex-col overflow-hidden">
-      <div className="flex items-center justify-between gap-3 px-3 py-1.5 bg-black border-b border-bbg-border-hi">
-        <h2 className="text-bbg-xs font-bold tracking-widest text-bbg-white flex-shrink-0">ECON·CALENDAR</h2>
+    <div className="bg-surface-alt h-full flex flex-col overflow-hidden">
+      <div className="flex items-center justify-between gap-3 px-4 py-2 bg-surface border-b border-border-hi">
+        <h2 className="text-ui-xs font-semibold tracking-widest text-text-primary flex-shrink-0">CALENDARIO</h2>
         <CountryFilter events={events} />
-        <span className="ml-auto text-bbg-xs text-bbg-muted flex-shrink-0 tabular-nums">
+        <span className="ml-auto text-ui-xs text-text-secondary flex-shrink-0 tabular-nums">
           {sorted.length}/{events.length}
         </span>
       </div>
       <div className="flex-1 overflow-auto">
-        <table className="w-full text-bbg-sm">
-          <thead className="sticky top-0 bg-bbg-panel border-b border-bbg-border-hi text-bbg-white uppercase text-[10px] tracking-widest">
+        <table className="w-full text-ui-sm">
+          <thead className="sticky top-0 bg-surface-alt border-b border-border-hi text-text-primary uppercase text-ui-xs tracking-widest">
             <tr>
-              <th className="text-left font-normal px-2 py-1">T</th>
-              <th className="text-left font-normal px-2 py-1">CTRY</th>
-              <th className="text-left font-normal px-2 py-1">EVENT</th>
-              <th className="text-right font-normal px-2 py-1">ACT</th>
-              <th className="text-right font-normal px-2 py-1">EST</th>
-              <th className="text-right font-normal px-2 py-1">PREV</th>
-              <th className="text-center font-normal px-2 py-1">IMP</th>
+              <th className="text-left font-medium px-2 py-1.5">T</th>
+              <th className="text-left font-medium px-2 py-1.5">PAIS</th>
+              <th className="text-left font-medium px-2 py-1.5">EVENTO</th>
+              <th className="text-right font-medium px-2 py-1.5">REAL</th>
+              <th className="text-right font-medium px-2 py-1.5">EST</th>
+              <th className="text-right font-medium px-2 py-1.5">ANT</th>
+              <th className="text-center font-medium px-2 py-1.5">IMP</th>
             </tr>
           </thead>
           <tbody>
             {sorted.length === 0 && (
-              <tr><td colSpan={7} className="px-2 py-6 text-center text-bbg-muted">NO EVENTS MATCH FILTER</td></tr>
+              <tr><td colSpan={7} className="px-2 py-8 text-center text-text-secondary text-ui-sm">Nenhum evento encontrado</td></tr>
             )}
             {grouped.map((group) => (
               <Fragment key={group.key}>
                 <tr>
-                  <td colSpan={7} className="sticky top-[28px] bg-bbg-panel-alt border-y border-bbg-border-hi px-2 py-0.5 text-[10px] font-bold tracking-widest text-bbg-yellow">
+                  <td colSpan={7} className="sticky top-[30px] bg-surface-hover border-y border-border-hi px-3 py-1 text-ui-xs font-semibold tracking-widest text-accent">
                     {group.label} · {group.events.length}
                   </td>
                 </tr>
