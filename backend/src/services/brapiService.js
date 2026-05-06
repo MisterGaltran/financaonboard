@@ -78,10 +78,11 @@ const IBOV_TICKER_REGEX = /^[A-Z]{4}(3|4|5|6|11)$/;
 
 async function getIbovList({ limit = 100 } = {}) {
   try {
-    const { data } = await client.get('/quote/list', {
-      params: { sortBy: 'volume', sortOrder: 'desc', limit: Math.max(limit, 200), type: 'stock' }
-    });
-    const stocks = (data?.stocks || []).filter((s) => IBOV_TICKER_REGEX.test(s.stock)).slice(0, limit);
+    const { data } = await client.get('/quote/list');
+    const stocks = (data?.stocks || [])
+      .filter((s) => IBOV_TICKER_REGEX.test(s.stock))
+      .sort((a, b) => (b.volume || 0) - (a.volume || 0))
+      .slice(0, limit);
     return stocks.map((s) => ({
       symbol: s.stock,
       name: s.name || s.stock,
