@@ -1,7 +1,11 @@
-api.davi-mendes.dedyn.io {
+davi-mendes.dedyn.io {
     encode zstd gzip
+    tls {
+        dns desec {
+            token {$DESEC_TOKEN}
+        }
+    }
     reverse_proxy localhost:4000
-
     log {
         output stderr
         format console

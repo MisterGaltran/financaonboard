@@ -2,7 +2,7 @@ const { logger } = require('../utils/logger');
 const { SOCKET_EVENTS, ROOMS } = require('../config/constants');
 const { getCurrencyQuotes, DEFAULT_PAIRS } = require('./awesomeApiService');
 
-const REFRESH_MS = 30_000;
+const REFRESH_MS = 15_000;
 
 let latest = [];
 let timer = null;

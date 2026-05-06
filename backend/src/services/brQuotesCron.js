@@ -2,7 +2,7 @@ const { logger } = require('../utils/logger');
 const { SOCKET_EVENTS, ROOMS } = require('../config/constants');
 const yahoo = require('./yahooQuotesService');
 
-const REFRESH_MS = 30_000;
+const REFRESH_MS = 15_000;
 const LIST_LIMIT = 50;
 
 let latest = [];

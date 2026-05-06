@@ -2,7 +2,7 @@ const { logger } = require('../utils/logger');
 const { ROOMS } = require('../config/constants');
 const { getMarketIndices } = require('./indicesService');
 
-const REFRESH_MS = 30_000;
+const REFRESH_MS = 15_000;
 
 let latest = {};
 let timer = null;
