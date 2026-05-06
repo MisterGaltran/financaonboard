@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Read(//c/Users/Davi/.claude/plans//**)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(Get-ChildItem -Path \"c:\\\\financaonboard\" -Force)",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(npm ls *)"
     ]
   }
 }
