@@ -3,7 +3,7 @@ const EventEmitter = require('events');
 const { env } = require('../config/env');
 const { logger } = require('../utils/logger');
 
-const POLL_INTERVAL_MS = 10_000;
+const POLL_INTERVAL_MS = 60_000; // Free tier: 5 calls/min
 const MAX_SEEN = 500;
 
 class PolygonRestPoller extends EventEmitter {
