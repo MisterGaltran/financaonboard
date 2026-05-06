@@ -18,13 +18,17 @@ const CURRENCY_CATALOG = [
   { symbol: 'XRPBRL', name: 'Ripple (XRP)', assetType: 'crypto' },
   { symbol: 'DOGEBRL', name: 'Dogecoin', assetType: 'crypto' },
   { symbol: 'LTCBRL', name: 'Litecoin', assetType: 'crypto' },
-  { symbol: 'SOLBRL', name: 'Solana', assetType: 'crypto' },
 ];
 
-const TABS = [
-  { key: 'stocks', label: 'AÇÕES' },
-  { key: 'currency', label: 'CÂMBIO & CRYPTO' },
-];
+function formatPrice(price) {
+  if (price == null || isNaN(price)) return '—';
+  try {
+    const digits = price > 1000 ? 0 : price < 1 ? 4 : 2;
+    return 'R$ ' + Number(price).toLocaleString('pt-BR', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  } catch {
+    return 'R$ ' + price;
+  }
+}
 
 export default function WatchlistEditor({ onClose }) {
   const symbols = useWatchlistStore((s) => s.symbols);
@@ -38,33 +42,47 @@ export default function WatchlistEditor({ onClose }) {
   const [tab, setTab] = useState('stocks');
   const [query, setQuery] = useState('');
   const inputRef = useRef(null);
-  useEffect(() => { inputRef.current?.focus(); }, []);
-  useEffect(() => { setQuery(''); }, [tab]);
 
-  const currencyMap = useMemo(() => {
-    const m = new Map();
-    for (const q of currencyQuotes) m.set(q.symbol, q);
-    return m;
-  }, [currencyQuotes]);
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
+  const handleTabChange = (newTab) => {
+    setTab(newTab);
+    setQuery('');
+  };
 
   const suggestions = useMemo(() => {
     const q = query.trim().toUpperCase();
+
     if (tab === 'stocks') {
-      if (!q) return ibov.slice(0, 12);
-      return ibov
-        .filter((s) => s.symbol.includes(q) || (s.name || '').toUpperCase().includes(q))
+      const list = Array.isArray(ibov) ? ibov : [];
+      if (!q) return list.slice(0, 12);
+      return list
+        .filter((s) => (s.symbol || '').includes(q) || (s.name || '').toUpperCase().includes(q))
         .slice(0, 20);
     }
+
     // currency & crypto tab
+    const liveMap = new Map();
+    if (Array.isArray(currencyQuotes)) {
+      for (const cq of currencyQuotes) liveMap.set(cq.symbol, cq);
+    }
+
     const items = CURRENCY_CATALOG.map((c) => {
-      const live = currencyMap.get(c.symbol);
-      return { ...c, price: live?.price ?? null, changePct: live?.changePct ?? null };
+      const live = liveMap.get(c.symbol);
+      return {
+        symbol: c.symbol,
+        name: c.name,
+        assetType: c.assetType,
+        price: live ? live.price : null,
+        changePct: live ? live.changePct : null,
+      };
     });
+
     if (!q) return items;
     return items.filter((c) =>
-      c.symbol.includes(q) || c.name.toUpperCase().includes(q) || c.assetType.toUpperCase().includes(q)
+      c.symbol.includes(q) || (c.name || '').toUpperCase().includes(q)
     );
-  }, [ibov, currencyQuotes, currencyMap, query, tab]);
+  }, [ibov, currencyQuotes, query, tab]);
 
   const handleAdd = (symbol) => {
     add(symbol);
@@ -82,15 +100,18 @@ export default function WatchlistEditor({ onClose }) {
         <div className="p-4 space-y-4">
           {/* Tabs */}
           <div className="flex gap-1">
-            {TABS.map((t) => (
-              <button
-                key={t.key}
-                onClick={() => setTab(t.key)}
-                className={`px-3 py-1.5 text-ui-xs tracking-widest rounded border ${tab === t.key ? 'bg-accent/20 border-accent text-accent-light' : 'bg-surface border-border text-text-secondary hover:border-accent'}`}
-              >
-                {t.label}
-              </button>
-            ))}
+            <button
+              onClick={() => handleTabChange('stocks')}
+              className={`px-3 py-1.5 text-ui-xs tracking-widest rounded border ${tab === 'stocks' ? 'bg-accent/20 border-accent text-accent-light' : 'bg-surface border-border text-text-secondary hover:border-accent'}`}
+            >
+              AÇÕES
+            </button>
+            <button
+              onClick={() => handleTabChange('currency')}
+              className={`px-3 py-1.5 text-ui-xs tracking-widest rounded border ${tab === 'currency' ? 'bg-accent/20 border-accent text-accent-light' : 'bg-surface border-border text-text-secondary hover:border-accent'}`}
+            >
+              CÂMBIO & CRYPTO
+            </button>
           </div>
 
           {/* Search */}
@@ -99,7 +120,7 @@ export default function WatchlistEditor({ onClose }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && suggestions[0]) {
+              if (e.key === 'Enter' && suggestions.length > 0) {
                 handleAdd(suggestions[0].symbol);
               }
               if (e.key === 'Escape') onClose();
@@ -123,7 +144,6 @@ export default function WatchlistEditor({ onClose }) {
                 const already = symbols.includes(s.symbol);
                 const isCrypto = s.assetType === 'crypto';
                 const isCurrency = s.assetType === 'currency';
-                const badge = isCrypto ? 'CRYPTO' : isCurrency ? 'FX' : null;
                 return (
                   <button
                     key={s.symbol}
@@ -135,15 +155,16 @@ export default function WatchlistEditor({ onClose }) {
                         {already ? '✓' : '+'}
                       </span>
                       <span className="font-semibold tracking-wider text-text-primary">{s.symbol}</span>
-                      <span className="text-text-secondary truncate max-w-[180px]">{s.name}</span>
-                      {badge && (
-                        <span className={`text-[9px] px-1.5 py-0.5 rounded tracking-wider ${isCrypto ? 'bg-warning/20 text-warning' : 'bg-info/20 text-info'}`}>
-                          {badge}
-                        </span>
+                      <span className="text-text-secondary truncate max-w-[180px]">{s.name || ''}</span>
+                      {isCrypto && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded tracking-wider bg-warning/20 text-warning">CRYPTO</span>
+                      )}
+                      {isCurrency && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded tracking-wider bg-info/20 text-info">FX</span>
                       )}
                     </span>
                     <span className="tabular-nums text-text-secondary">
-                      {s.price != null ? `R$ ${s.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: s.price > 1000 ? 0 : 4 })}` : '—'}
+                      {formatPrice(s.price)}
                     </span>
                   </button>
                 );
