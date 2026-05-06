@@ -12,6 +12,7 @@ class BrRssPoller {
     this.io = io;
     this.parser = new Parser({ timeout: 8_000, headers: { 'User-Agent': 'FinancaOnboard/1.0 (+local)' } });
     this.seen = new Set();
+    this.seenHeadlines = new Set();
     this.timer = null;
     this.stopped = false;
     this.firstRun = true;
@@ -67,7 +68,10 @@ class BrRssPoller {
       for (const raw of items.slice().reverse()) {
         const news = this._normalize(raw, feed.name);
         if (this.seen.has(news.id)) continue;
+        const headlineKey = news.headline.toLowerCase().trim();
+        if (this.seenHeadlines.has(headlineKey)) continue;
         this.seen.add(news.id);
+        this.seenHeadlines.add(headlineKey);
         this._emit(news);
         emittedCount += 1;
       }
@@ -83,6 +87,7 @@ class BrRssPoller {
     this.firstRun = false;
     if (this.seen.size > MAX_SEEN) {
       this.seen = new Set(Array.from(this.seen).slice(-MAX_SEEN));
+      this.seenHeadlines = new Set(Array.from(this.seenHeadlines).slice(-MAX_SEEN));
     }
     if (!this.stopped) this.timer = setTimeout(() => this._tick(), env.BR_RSS_POLL_INTERVAL_MS);
   }
