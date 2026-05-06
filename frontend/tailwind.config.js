@@ -24,23 +24,6 @@ export default {
         'negative-dim': '#991b1b',
         'warning':      '#f59e0b',
         'info':         '#38bdf8',
-
-        // ═══ Legacy aliases (removed after migration) ═══
-        'bbg-bg':        '#0a0a0f',
-        'bbg-panel':     '#12121a',
-        'bbg-panel-alt': '#1a1a25',
-        'bbg-border':    '#1e1e2e',
-        'bbg-border-hi': '#2a2a3a',
-        'bbg-amber':     '#e1e1e6',
-        'bbg-amber-dim': '#6b6b80',
-        'bbg-white':     '#e1e1e6',
-        'bbg-muted':     '#6b6b80',
-        'bbg-cyan':      '#38bdf8',
-        'bbg-green':     '#22c55e',
-        'bbg-green-dim': '#15803d',
-        'bbg-red':       '#ef4444',
-        'bbg-red-dim':   '#991b1b',
-        'bbg-yellow':    '#f59e0b',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
